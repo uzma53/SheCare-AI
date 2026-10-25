@@ -1,11 +1,10 @@
 /**
- * SurvivorCare AI / SheCare AI - Nearby Healthcare Module
- * 
- * Harmonized alias for NearbyPlaces engine.
- * Ensures single map initialization, preventing duplicate HTML IDs or conflicting event listeners.
+ * SheCare AI / SurvivorCare AI - Nearby Healthcare Module Linker
+ * Harmonized alias ensuring zero duplication or conflict with NearbyPlaces.
  */
-(function() {
-  if (typeof NearbyPlaces !== 'undefined') {
-    window.NearbyHealthcare = NearbyPlaces;
-  }
-})();
+if (typeof NearbyPlaces !== 'undefined') {
+  window.NearbyHealthcare = NearbyPlaces;
+}
+if (typeof AgencyReporting !== 'undefined') {
+  window.NearbyHealthcareReporting = AgencyReporting;
+}
