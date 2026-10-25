@@ -1,5 +1,13 @@
 [
   {
+    "id": "gw_6e1f3fceb15788d6",
+    "timestamp": "2026-10-25T08:24:38.832592+00:00",
+    "recipient": "+923001234567",
+    "messageLength": 37,
+    "status": "DISPATCHED_TO_CARRIER",
+    "deliveryNote": "Dispatched to SMS gateway. Carrier handshake completed. Recipient delivery depends on mobile network coverage."
+  },
+  {
     "id": "gw_dd3b94daedfc86e6",
     "timestamp": "2026-10-25T08:00:49.570066+00:00",
     "recipient": "+923001234567",
