@@ -1,0 +1,96 @@
+<!-- SheCare AI / SurvivorCare AI - Nearby Help & Safe Places Section -->
+<section class="view-section" id="view-nearby-places">
+  <div class="section-header">
+    <h1>🏥 Nearby Help & Safe Places</h1>
+    <p>Locate verified emergency departments, hospitals, women's safe shelters, crisis centres, and legal aid across Pakistan, India, and internationally.</p>
+  </div>
+
+  <!-- Immediate Life Danger Alert -->
+  <div class="alert-box alert-danger">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:24px;height:24px;min-width:24px;max-width:24px;flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+    <div>
+      <strong>Immediate Life Threat Warning:</strong> If you are being pursued or in immediate physical danger, call national emergency services immediately (<strong>1122 / 115</strong> in Pakistan, <strong>112 / 181</strong> in India, <strong>911</strong> in US, <strong>999</strong> in UK) or activate the SOS alert.
+    </div>
+  </div>
+
+  <!-- Privacy & Location Notice -->
+  <div class="location-privacy-banner">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
+        <span id="locationStatusBadge" class="location-status-badge inactive">🔒 No location active (Strict Privacy Protected)</span>
+        <button type="button" class="btn btn-sm btn-outline" id="btnClearLocation" style="display:none;padding:4px 8px;font-size:0.75rem;">❌ Clear / Stop Location</button>
+      </div>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin:0;">
+        Your location is 100% optional and processed locally in your browser memory. We never transmit coordinates to external tracking servers.
+      </p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <button type="button" class="btn btn-sm btn-primary" id="btnDetectLocation">
+        📍 Use My Current Location
+      </button>
+      <span class="badge" style="background:#f0fdfa;color:#0d9488;border:1px solid #ccfbf1;font-weight:600;font-size:0.78rem;">
+        🗺️ Leaflet.js & OpenStreetMap (Free)
+      </span>
+    </div>
+  </div>
+
+  <!-- Search Controls & Filters -->
+  <div class="search-controls-card">
+    <!-- Country / Region Selection -->
+    <div style="margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="font-size:0.82rem;font-weight:700;color:var(--text);">Filter by Country / Region:</span>
+      <div class="country-pills-container" id="nearbyCountryPills"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+      <div style="flex:1;min-width:240px;position:relative;">
+        <input type="text" class="form-control" id="inputPlacesSearch" placeholder="Enter area, city, or address (e.g., Gulberg Lahore, Clifton Karachi, South Delhi, Bandra Mumbai)...">
+      </div>
+      <button type="button" class="btn btn-primary" id="btnExecutePlacesSearch">
+        🔍 Search Area / Address
+      </button>
+      <button type="button" class="btn btn-secondary" id="btnOpenGmapsExternalSearch" title="Open Google Maps search in new tab">
+        🌐 Search on Google Maps
+      </button>
+    </div>
+
+    <!-- Quick City Shortcuts -->
+    <div class="quick-cities-bar">
+      <span style="font-size:0.78rem;font-weight:700;color:var(--text-muted);">Quick Areas:</span>
+      <button type="button" class="btn-quick-city" data-city="lahore">Lahore</button>
+      <button type="button" class="btn-quick-city" data-city="karachi">Karachi</button>
+      <button type="button" class="btn-quick-city" data-city="islamabad">Islamabad</button>
+      <button type="button" class="btn-quick-city" data-city="rawalpindi">Rawalpindi</button>
+      <button type="button" class="btn-quick-city" data-city="multan">Multan</button>
+      <button type="button" class="btn-quick-city" data-city="peshawar">Peshawar</button>
+      <button type="button" class="btn-quick-city" data-city="delhi">New Delhi</button>
+      <button type="button" class="btn-quick-city" data-city="mumbai">Mumbai</button>
+      <button type="button" class="btn-quick-city" data-city="bengaluru">Bengaluru</button>
+    </div>
+
+    <!-- Search Radius Controls -->
+    <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span style="font-size:0.82rem;font-weight:600;color:var(--text);">Search Radius:</span>
+      <div class="radius-pills-container" id="nearbyRadiusPills"></div>
+    </div>
+  </div>
+
+  <!-- Category Filter Chips -->
+  <div style="margin-bottom:12px;">
+    <div style="font-size:0.84rem;font-weight:600;color:var(--text);margin-bottom:8px;">Filter by Facility Category:</div>
+    <div class="category-chips-container" id="nearbyCategoryChips"></div>
+  </div>
+
+  <!-- Interactive Map Canvas Wrapper -->
+  <div class="nearby-map-wrapper">
+    <div id="nearbyInteractiveMapCanvas"></div>
+  </div>
+
+  <!-- Results Header & Counter -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+    <h2 style="font-size:1.15rem;font-weight:700;margin:0;" id="nearbyResultsCount">Verified Facilities Directory</h2>
+    <span style="font-size:0.8rem;color:var(--text-muted);">🔒 Verified Real Contacts • No Fictional Facilities</span>
+  </div>
+
+  <!-- Results List -->
+  <div id="nearbyPlacesListContainer"></div>
+</section>
