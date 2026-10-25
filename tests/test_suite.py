@@ -564,5 +564,50 @@ class SheCareVerificationTests(unittest.TestCase):
         # Check search radius circle plotting on Leaflet map
         self.assertIn('L.circle(userLatLng', nearby_code)
 
+    # -------------------------------------------------------------
+    # 21. Nominatim Geocoding & Overpass API Live Query Resilience
+    # -------------------------------------------------------------
+    def test_23_nominatim_geocoding_and_overpass_integration(self):
+        """Verify Nominatim geocoding and Overpass live search integration in nearby_places.js."""
+        nearby_code = get_source_content(os.path.join('js', 'nearby_places.js'))
+
+        # Check Nominatim geocoding URL and parameters
+        self.assertIn('https://nominatim.openstreetmap.org/search', nearby_code)
+        self.assertIn('executeManualSearch', nearby_code)
+
+        # Check Overpass API integration with timeout and caching
+        self.assertIn('https://overpass-api.de/api/interpreter', nearby_code)
+        self.assertIn('fetchOverpassNearbyPlaces', nearby_code)
+        self.assertIn('parseOverpassElements', nearby_code)
+        self.assertIn('overpassCache', nearby_code)
+
+    # -------------------------------------------------------------
+    # 22. Harmonized Module Aliases & Zero Conflict Architecture
+    # -------------------------------------------------------------
+    def test_24_harmonized_module_aliases_no_conflicts(self):
+        """Verify safe_places.js, nearby-healthcare.js, safe_places.css and safe_places_section.html exist without conflicts."""
+        # Check files exist
+        self.assertTrue(os.path.exists(os.path.join(BASE_DIR, 'js', 'safe_places.js')))
+        self.assertTrue(os.path.exists(os.path.join(BASE_DIR, 'js', 'nearby-healthcare.js')))
+        self.assertTrue(os.path.exists(os.path.join(BASE_DIR, 'css', 'safe_places.css')))
+        self.assertTrue(os.path.exists(os.path.join(BASE_DIR, 'safe_places_section.html')))
+
+        # Check aliases avoid duplicate map initializations
+        safe_places_code = get_source_content(os.path.join('js', 'safe_places.js'))
+        self.assertIn('window.SafePlaces = NearbyPlaces', safe_places_code)
+
+        nearby_health_code = get_source_content(os.path.join('js', 'nearby-healthcare.js'))
+        self.assertIn('window.NearbyHealthcare = NearbyPlaces', nearby_health_code)
+
+        # Check zero duplicate IDs in index.html
+        index_html = get_source_content('index.html')
+        markup = index_html[index_html.find('<body>'):index_html.find('<script id="shecare-bundled-engine">')]
+        import re
+        from collections import Counter
+        ids = re.findall(r'\bid=["\']([^"\']+)["\']', markup)
+        counts = Counter(ids)
+        dups = [k for k, v in counts.items() if v > 1]
+        self.assertEqual(len(dups), 0, f"Duplicate HTML IDs found: {dups}")
+
 if __name__ == '__main__':
     unittest.main()
