@@ -184,8 +184,30 @@ Includes independently verified official resources categorized by country and se
 
 ---
 
-### N. Nearby Help & Safe Places (Leaflet.js & OpenStreetMap Engine)
-A dedicated, trauma-informed locator designed to help survivors find immediate physical refuge, specialized medical care, emergency forensic triage, and free legal aid.
+### N. Nearby Help & Safe Places, Security Agency Location Sharing & Incident Reporting
+A dedicated, trauma-informed locator and rapid emergency dispatch system designed to help survivors find immediate physical refuge, medical care, forensic triage, and directly contact security agencies to report scenarios with live GPS coordinates.
+
+- **🚨 Security Agency Contact & Live Location Sharing**:
+  - **Direct Official Contacts**: 1-tap direct phone calling to verified law enforcement and emergency dispatchers:
+    - 🇵🇰 **Pakistan**: Police Rescue 15, Rescue 1122 Ambulance & Fire, Edhi Foundation 115, National Women Helpline 1099, Punjab VAWC / Women Protection 1043, CPLC Karachi 1102.
+    - 🇮🇳 **India**: Integrated Emergency 112, Women Helpline 181, Police 100, Ambulance 108.
+    - 🌐 **Global**: USA/Canada 911, UK 999, European Union / International 112.
+  - **Live GPS Map Pin Sharing**: Formats and transmits exact GPS coordinates (`latitude, longitude`), area name, and live Google Maps URL (`https://maps.google.com/?q={lat},{lng}`) to security agencies and trusted contacts.
+
+- **👁️ Dual Reporting Modes: Survivor Distress vs. Bystander / Witness Report**:
+  - **Survivor Mode (🔴 In Danger)**: Formats urgent survivor plea: `"EMERGENCY: I am a survivor in immediate physical danger. Need police/rescue dispatch to my location immediately."`
+  - **Witness Mode (🟡 Bystander Scenario Report)**: Enables witnesses and bystanders observing a crime or violent scenario to inform authorities: `"INCIDENT REPORT: I am a witness reporting an active crime / violent scenario. Urgent police / rescue intervention required at this location."`
+  - **Scenario Classification**: Triage for physical assault, stalking/harassment, domestic violence/hostage, critical trauma bleeding, kidnapping attempts, and witnessed armed threats.
+  - **Multi-Channel Dispatch**: 1-tap Handshake to native Device SMS (`sms:15?body=...`), WhatsApp Dispatcher (`https://wa.me/?text=...`), 1-Click Clipboard Copy, Web Share API (`navigator.share`), and encrypted local evidentiary logging (`survivorcare_incident_reports`).
+
+- **100% Free & Open-Source Mapping Engine**:
+  - **Leaflet.js v1.9.4**: Lightweight, mobile-friendly interactive mapping library loaded from the official unpkg CDN.
+  - **OpenStreetMap Standard Tiles**: Crisp, community-verified global map tiles (`https://tile.openstreetmap.org/{z}/{x}/{y}.png`) with zero API keys, zero Google billing, and zero account requirements.
+  - **Click-to-Drop Pin**: Survivors can simply tap or click anywhere on the Leaflet map to drop their pin and compute real distances instantly without needing browser GPS permission.
+
+- **Expanded Categories & Massive Verified Regional Directory**:
+  - **New Categories**: Police & Security Agencies (👮), Rescue 1122 & Ambulance Stations (🚑), Emergency & Casualty Trauma Wards (🚨), Hospitals (🏥), Clinics (🩺), Pharmacies (💊), Doctors (👨‍⚕️), Women's Shelters (🏡), Support NGOs (🤝), Survivor Crisis Helplines (🛡️), Counselling (🧠), Legal Aid (⚖️).
+  - **49+ Verified Authentic Regional Facilities**: Verified entries across Lahore, Karachi, Islamabad, Rawalpindi, Peshawar, Multan, Faisalabad, Quetta, Delhi, Mumbai, Bengaluru, London, and New York with real emergency hotlines, exact coordinates, and directions.
 
 - **100% Free & Open-Source Mapping Engine**:
   - **Leaflet.js v1.9.4**: Lightweight, mobile-friendly interactive mapping library loaded from the official unpkg CDN.
