@@ -8,31 +8,29 @@ const App = {
   isDiscreetMode: false,
 
   async init() {
+    // Each start-up step is isolated. If one module ever fails, every other module
+    // (and all of its buttons) still starts, instead of the whole app dying half-wired.
+    const safe = (label, fn) => {
+      try { return fn(); } catch (err) { console.error('SheCare AI: "' + label + '" failed to start', err); }
+    };
+
     // 1. Initialize Auth
-    await Auth.init();
+    try { await Auth.init(); } catch (err) { console.error('SheCare AI: Auth failed to start', err); }
 
-    // 2. Setup Navigation
-    this.setupNavigation();
-
-    // 3. Setup Quick Exit & Camouflage Notes
-    this.setupQuickExit();
-
-    // 4. Setup Discreet Mode Toggle
-    this.setupDiscreetMode();
+    // 2-4. Core UI: navigation, quick exit & camouflage, discreet mode, modal behaviour
+    safe('navigation', () => this.setupNavigation());
+    safe('quick exit', () => this.setupQuickExit());
+    safe('discreet mode', () => this.setupDiscreetMode());
+    safe('modals', () => this.setupModalBackdrops());
 
     // 5. Initialize Sub-modules
-    this.initMentalHealth();
-    this.initPhysicalHealth();
-    this.initPeriodTracker();
-    this.initPregnancySTI();
-    this.initSOS();
-    this.initNearbyPlaces();
-    this.initAgencyReporting();
-    this.initSafetyPlan();
-    this.initAuthAndSessions();
+    [
+      'initMentalHealth', 'initPhysicalHealth', 'initPeriodTracker', 'initPregnancySTI',
+      'initSOS', 'initNearbyPlaces', 'initAgencyReporting', 'initSafetyPlan', 'initAuthAndSessions'
+    ].forEach(name => safe(name, () => this[name]()));
 
     // 6. Check if user is logged in
-    this.updateUserInterface();
+    safe('user interface', () => this.updateUserInterface());
 
     console.log('SheCare AI initialized successfully in Offline-First Mode.');
   },
@@ -233,6 +231,17 @@ const App = {
   closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.classList.remove('active');
+  },
+
+  // Click on the dimmed backdrop closes a modal. The lock screen and the emergency report
+  // are excluded so they can never be dismissed or lost by an accidental tap.
+  setupModalBackdrops() {
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      if (overlay.id === 'modalLockScreen' || overlay.id === 'modalAgencyReport') return;
+      overlay.addEventListener('mousedown', (e) => {
+        if (e.target === overlay) this.closeModal(overlay.id);
+      });
+    });
   },
 
   showLockScreen() {
@@ -1050,6 +1059,18 @@ const App = {
       });
     }
 
+    // Lock App Now Button (re-uses the same lock screen as the inactivity auto-lock)
+    const btnLockNow = document.getElementById('btnLockNow');
+    if (btnLockNow) {
+      btnLockNow.addEventListener('click', () => {
+        if (!Auth.currentUser) {
+          this.showToast('Create a safe profile first - the lock screen needs a password to unlock.', 'calm');
+          return;
+        }
+        Auth.triggerAutoLock();
+      });
+    }
+
     // Export Data Button
     const btnExport = document.getElementById('btnExportData');
     if (btnExport) {
@@ -1098,6 +1119,9 @@ const App = {
     }
   }
 };
+
+// Make App reachable as window.App too (a top-level const is not a window property)
+window.App = App;
 
 // Global Bootstrapper
 window.addEventListener('DOMContentLoaded', () => {
