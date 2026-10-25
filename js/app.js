@@ -72,13 +72,16 @@ const App = {
 
     if (viewId === 'view-nearby-places' && typeof NearbyPlaces !== 'undefined') {
       setTimeout(() => {
-        if (!NearbyPlaces.leafletInitialized) {
+        try { NearbyPlaces.renderCountryPills(); } catch (e) {}
+        try { NearbyPlaces.renderCategoryChips(); } catch (e) {}
+        try { NearbyPlaces.renderRadiusPills(); } catch (e) {}
+        if (!NearbyPlaces.leafletInitialized || !NearbyPlaces.leafletMap) {
           NearbyPlaces.initLeafletMap();
-        } else if (NearbyPlaces.leafletMap) {
-          NearbyPlaces.leafletMap.invalidateSize();
+        } else {
+          try { NearbyPlaces.leafletMap.invalidateSize(); } catch (e) {}
         }
         NearbyPlaces.applyFiltersAndRender();
-      }, 100);
+      }, 50);
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
