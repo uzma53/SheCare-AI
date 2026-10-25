@@ -1,29 +1,43 @@
 /**
- * SurvivorCare AI / SheCare AI - Nearby Help & Safe Places Engine
+ * SurvivorCare AI / SheCare AI - Nearby Healthcare & Safe Places Engine
  * 
  * Powered by Leaflet.js v1.9.4 & OpenStreetMap (Zero-API-Key, 100% Free & Open-Source)
- * with Nominatim Geocoding & Live Overpass API Search.
+ * with Overpass API Live Healthcare/Shelter Search & Nominatim Geocoding.
  * 
  * Categories:
  * 1. Nearby Hospitals
  * 2. Emergency Departments
- * 3. Women's Shelters & Safe Accommodation
- * 4. Women's Support Centres and NGOs
- * 5. Sexual-Assault Survivor Support Services
- * 6. Counselling and Mental-Health Services
- * 7. Relevant Legal-Aid Services
+ * 3. Clinics & Medical Centres
+ * 4. Pharmacies
+ * 5. Doctors & Dentists
+ * 6. Women's Shelters & Safe Accommodation
+ * 7. Women's Support Centres and NGOs
+ * 8. Sexual-Assault Survivor Support Services
+ * 9. Counselling and Mental-Health Services
+ * 10. Relevant Legal-Aid Services
  * 
- * Location Privacy & Usability:
- * - Geolocation is 100% strictly optional.
- * - Coordinates remain strictly inside browser memory.
- * - Survivors can easily set their location by:
- *   1. Clicking "📍 Use My Current Location" (Browser GPS on explicit request)
- *   2. Clicking ANYWHERE on the Leaflet map to drop their pin!
- *   3. Clicking quick city shortcuts (Lahore, Karachi, Islamabad, Delhi, Mumbai, etc.)
- *   4. Typing any city, district, or address into the search bar (Nominatim geocoding).
+ * Privacy & Safety Safeguards:
+ * - Geolocation is never requested automatically on load.
+ * - Browser GPS is queried ONLY after the survivor explicitly clicks "Use My Location".
+ * - User coordinates and searches are kept strictly in browser memory (never stored or tracked).
+ * - Honest intake & verification notices: Ordinary hospitals are never labeled as shelters,
+ *   and unverified/live data is clearly distinguished from verified directory entries.
  */
 
 const NearbyPlaces = {
+  // Configurable Map & Data Providers
+  config: {
+    tileLayerUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+    minZoom: 3,
+    overpassEndpoints: [
+      'https://overpass-api.de/api/interpreter',
+      'https://overpass.kumi.systems/api/interpreter'
+    ],
+    nominatimEndpoint: 'https://nominatim.openstreetmap.org/search'
+  },
+
   // Supported Countries & Regions
   countries: [
     { id: 'all', label: 'All Regions' },
@@ -56,9 +70,12 @@ const NearbyPlaces = {
 
   // Category definitions with icons and descriptions
   categories: [
-    { id: 'all', label: 'All Safe Places', icon: '📍' },
+    { id: 'all', label: 'All Safe Facilities', icon: '📍' },
     { id: 'hospital', label: 'Hospitals', icon: '🏥' },
     { id: 'emergency', label: 'Emergency Departments', icon: '🚨' },
+    { id: 'clinic', label: 'Clinics & Centres', icon: '🩺' },
+    { id: 'pharmacy', label: 'Pharmacies', icon: '💊' },
+    { id: 'doctor', label: 'Doctors & Dentists', icon: '👨‍⚕️' },
     { id: 'shelter', label: "Women's Shelters", icon: '🏡' },
     { id: 'ngo', label: 'Support Centres & NGOs', icon: '🤝' },
     { id: 'survivor_support', label: 'Survivor Support', icon: '🛡️' },
@@ -595,15 +612,17 @@ const NearbyPlaces = {
   leafletInitialized: false,
 
   init() {
-    // 1. Setup DOM event listeners
     this.setupEventListeners();
-
-    // 2. Render country, category & radius pills
     this.renderCountryPills();
     this.renderCategoryChips();
     this.renderRadiusPills();
 
-    // 3. Initial render of list & map
+    // If map container is already visible, initialize map now
+    const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
+    if (mapCanvas && mapCanvas.offsetParent !== null) {
+      this.initLeafletMap();
+    }
+
     this.applyFiltersAndRender();
   },
 
@@ -650,6 +669,14 @@ const NearbyPlaces = {
     if (btnGmapsDirect) {
       btnGmapsDirect.addEventListener('click', () => {
         this.openCurrentSearchInGoogleMaps();
+      });
+    }
+
+    // Search visible map area button
+    const btnSearchArea = document.getElementById('btnSearchVisibleArea');
+    if (btnSearchArea) {
+      btnSearchArea.addEventListener('click', () => {
+        this.searchCurrentMapArea();
       });
     }
   },
@@ -735,16 +762,10 @@ const NearbyPlaces = {
     }
 
     const consent = confirm(
-      'LOCATION SAFETY NOTICE:
-
-' +
-      '• SurvivorCare AI processes your coordinates strictly inside your browser.
-' +
-      '• Your location is NEVER sent to remote tracking servers or shared.
-' +
-      '• It is used solely to compute distance to nearby safe facilities.
-
-' +
+      'LOCATION SAFETY NOTICE:\n\n' +
+      '• SurvivorCare AI processes your coordinates strictly inside your browser.\n' +
+      '• Your location is NEVER sent to remote tracking servers or shared.\n' +
+      '• It is used solely to compute distance to nearby safe facilities.\n\n' +
       'Proceed with browser location detection?'
     );
 
@@ -775,13 +796,9 @@ const NearbyPlaces = {
         }
         
         alert(
-          msg + '
-
-' +
-          '💡 EASY ALTERNATIVE:
-' +
-          '1. Simply CLICK anywhere on the interactive map to place your pin!
-' +
+          msg + '\n\n' +
+          '💡 EASY ALTERNATIVE:\n' +
+          '1. Simply CLICK anywhere on the interactive map to place your pin!\n' +
           '2. Or click any quick city button below (Lahore, Karachi, Delhi, etc.).'
         );
       },
@@ -860,10 +877,10 @@ const NearbyPlaces = {
       }
     }
 
-    // 2. Query Nominatim OpenStreetMap Geocoder (Respecting rate limit with descriptive User-Agent)
+    // 2. Query Nominatim OpenStreetMap Geocoder (without autocomplete, single request on submit)
     this.showSearchSpinner(true, `Searching OpenStreetMap for "${query}"...`);
     try {
-      const nomUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&addressdetails=1`;
+      const nomUrl = `${this.config.nominatimEndpoint}?format=json&q=${encodeURIComponent(query)}&limit=1&addressdetails=1`;
       const response = await fetch(nomUrl, {
         headers: {
           'Accept': 'application/json'
@@ -881,16 +898,12 @@ const NearbyPlaces = {
         const displayName = item.display_name.split(',').slice(0, 3).join(', ');
         this.setUserCoordinates(lat, lng, displayName, false);
       } else {
-        // Fallback to text filtering across verified facilities
         this.applyFiltersAndRender();
-        alert(`Could not pinpoint "${query}" on OpenStreetMap.
-
-Tip: You can tap or click anywhere on the Leaflet map to place your pin manually!`);
+        alert(`Could not pinpoint "${query}" on OpenStreetMap.\n\nTip: You can tap or click anywhere on the Leaflet map to place your pin manually!`);
       }
     } catch (err) {
       this.showSearchSpinner(false);
       console.warn('Nominatim geocoding network notice:', err);
-      // Graceful offline fallback: filter local directory by search text
       this.applyFiltersAndRender();
     }
   },
@@ -912,7 +925,20 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
     }
   },
 
-  // Overpass API Query for Live OpenStreetMap Hospitals, Clinics, and Shelters
+  // Search currently visible map area (when user pans/zooms map)
+  searchCurrentMapArea() {
+    if (!this.leafletMap) return;
+    const center = this.leafletMap.getCenter();
+    const bounds = this.leafletMap.getBounds();
+    const radiusKm = Math.round(center.distanceTo(bounds.getNorthEast()) / 1000) || 5;
+
+    this.fetchOverpassNearbyPlaces(center.lat, center.lng, radiusKm);
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(`Searching visible map area (${radiusKm} km radius)...`, 'info');
+    }
+  },
+
+  // Overpass API Query for Live OpenStreetMap Hospitals, Clinics, Pharmacies, Doctors, and Shelters
   async fetchOverpassNearbyPlaces(lat, lng, radiusKm) {
     const radiusMeters = Math.min(25000, Math.max(2000, (radiusKm === 'all' ? 10 : radiusKm) * 1000));
     const cacheKey = `${lat.toFixed(2)}_${lng.toFixed(2)}_${radiusMeters}`;
@@ -923,22 +949,19 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
       return;
     }
 
+    // Comprehensive healthcare & safe shelter query
     const overpassQuery = `[out:json][timeout:8];(
-      node["amenity"~"hospital|clinic"](around:${radiusMeters},${lat},${lng});
-      way["amenity"~"hospital|clinic"](around:${radiusMeters},${lat},${lng});
+      node["amenity"~"hospital|clinic|pharmacy|doctors|dentist"](around:${radiusMeters},${lat},${lng});
+      way["amenity"~"hospital|clinic|pharmacy|doctors|dentist"](around:${radiusMeters},${lat},${lng});
       node["social_facility"~"shelter|group_home"](around:${radiusMeters},${lat},${lng});
+      way["social_facility"~"shelter|group_home"](around:${radiusMeters},${lat},${lng});
       node["social_facility:for"="woman"](around:${radiusMeters},${lat},${lng});
-    );out center 25;`;
+    );out center 35;`;
 
-    this.showSearchSpinner(true, 'Finding live nearby hospitals & shelters on OpenStreetMap...');
-
-    const endpoints = [
-      'https://overpass-api.de/api/interpreter',
-      'https://overpass.kumi.systems/api/interpreter'
-    ];
+    this.showSearchSpinner(true, 'Finding live nearby healthcare facilities & shelters on OpenStreetMap...');
 
     let rawData = null;
-    for (const ep of endpoints) {
+    for (const ep of this.config.overpassEndpoints) {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 7000);
@@ -954,7 +977,7 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
           break;
         }
       } catch (e) {
-        // Continue to fallback
+        // Fallback to next endpoint
       }
     }
 
@@ -966,7 +989,6 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
       this.liveOsmPlaces = parsed;
       this.applyFiltersAndRender();
     } else {
-      // Overpass timed out or no OSM nodes found — seamlessly fall back to verified directory
       this.liveOsmPlaces = [];
       this.applyFiltersAndRender();
     }
@@ -976,25 +998,54 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
     const list = [];
     elements.forEach((el, idx) => {
       const tags = el.tags || {};
-      const name = tags.name || tags['name:en'] || tags.operator || (tags.amenity === 'hospital' ? 'Community Hospital' : (tags.amenity === 'clinic' ? 'Healthcare Clinic' : 'Community Safe Shelter'));
+      const amenity = tags.amenity || '';
+      const social = tags.social_facility || '';
+      const rawName = tags.name || tags['name:en'] || tags.operator || '';
+
+      // Clean default names based on facility type
+      let defaultName = 'Healthcare Facility';
+      if (amenity === 'hospital') defaultName = 'Community Hospital';
+      else if (amenity === 'clinic') defaultName = 'Medical Clinic';
+      else if (amenity === 'pharmacy') defaultName = 'Pharmacy / Chemist';
+      else if (amenity === 'doctors') defaultName = "Doctor's Clinic";
+      else if (amenity === 'dentist') defaultName = 'Dental Clinic';
+      else if (social === 'shelter' || tags['social_facility:for'] === 'woman') defaultName = 'Community Shelter';
+
+      const name = rawName || defaultName;
       const pLat = el.lat || (el.center && el.center.lat);
       const pLng = el.lon || (el.center && el.center.lon);
       if (!pLat || !pLng) return;
 
+      // Strict categorisation: do not mislabel ordinary hospitals as women's shelters
       let cat = 'hospital';
-      if (tags.emergency === 'yes' || /emergency|trauma|casualty|acute/i.test(name)) {
-        cat = 'emergency';
-      } else if (tags.social_facility === 'shelter' || tags['social_facility:for'] === 'woman' || /shelter|refuge|crisis/i.test(name)) {
+      let serviceLabel = 'Hospital Healthcare Services';
+
+      if (amenity === 'pharmacy') {
+        cat = 'pharmacy';
+        serviceLabel = 'Pharmacy & Medicine Dispensing';
+      } else if (amenity === 'doctors' || amenity === 'dentist') {
+        cat = 'doctor';
+        serviceLabel = amenity === 'dentist' ? 'Dental Healthcare Services' : 'Physician / Medical Practice';
+      } else if (amenity === 'clinic') {
+        cat = 'clinic';
+        serviceLabel = 'Outpatient Healthcare Clinic';
+      } else if (social === 'shelter' || tags['social_facility:for'] === 'woman' || /women'?s?\s+shelter|safe\s+house|refuge/i.test(name)) {
         cat = 'shelter';
-      } else if (tags.amenity === 'clinic') {
+        serviceLabel = "Women's Shelter & Safe Refuge";
+      } else if (tags.emergency === 'yes' || /emergency|trauma|casualty|acute/i.test(name)) {
+        cat = 'emergency';
+        serviceLabel = 'Emergency Department & Casualty Triage';
+      } else {
         cat = 'hospital';
+        serviceLabel = 'General Hospital Care';
       }
 
       const street = tags['addr:street'] ? `${tags['addr:street']}${tags['addr:housenumber'] ? ' ' + tags['addr:housenumber'] : ''}` : '';
       const city = tags['addr:city'] || tags['addr:district'] || tags['addr:suburb'] || '';
       const address = [street, city].filter(Boolean).join(', ') || `OpenStreetMap Coordinates [${pLat.toFixed(3)}, ${pLng.toFixed(3)}]`;
-      const phone = tags.phone || tags['contact:phone'] || tags['phone:emergency'] || 'Inquire on arrival / Call local 112 / 1122';
-      const hours = tags.opening_hours || (cat === 'emergency' ? '24/7 Open Emergency Casualty' : 'Standard Healthcare Hours');
+      const rawPhone = tags.phone || tags['contact:phone'] || tags['phone:emergency'] || '';
+      const phone = rawPhone || 'Contact details not listed in OSM (Inquire on arrival)';
+      const hours = tags.opening_hours || (cat === 'emergency' ? '24/7 Open Emergency Casualty' : 'Operating hours vary (call to confirm)');
 
       list.push({
         id: `osm-${el.id || idx}`,
@@ -1006,12 +1057,15 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
         lng: pLng,
         address: address,
         phone: phone,
+        hasRealPhone: Boolean(rawPhone),
         hours: hours,
-        verifiedSource: 'OpenStreetMap Live Data (OSM Contributors)',
+        verifiedSource: 'OpenStreetMap Live Data (Community Contributors)',
         lastVerified: 'Live Query',
-        serviceType: cat === 'emergency' ? 'Emergency Department & Casualty' : (cat === 'shelter' ? 'Women Shelter Facility' : 'Hospital Healthcare Services'),
-        capacityNotice: 'Discovered via live OpenStreetMap query. Capacity and current admission must be confirmed directly with facility.',
-        admissionNote: 'This facility was located via live OpenStreetMap data. Survivors seeking post-assault PEP or forensic documentation should verify officer presence in advance.',
+        serviceType: serviceLabel,
+        capacityNotice: 'Discovered via live OpenStreetMap query. Capacity, staffing, and current intake must be confirmed directly with facility.',
+        admissionNote: cat === 'shelter'
+          ? 'Community shelter discovered via OpenStreetMap. Please contact ahead or call national helpline 1099/181 to verify safety, admission protocol, and availability.'
+          : 'Healthcare facility listing from OpenStreetMap. For post-assault PEP or forensic documentation, verify Medico-Legal Officer presence.',
         googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + ' ' + address)}`,
         sourceType: 'osm_live'
       });
@@ -1052,7 +1106,6 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
 
   // Filter places based on active criteria
   getFilteredPlaces() {
-    // Combine verified directory with live OSM query results, avoiding duplicate coords (< 250m)
     const combined = [...this.verifiedPlaces];
     this.liveOsmPlaces.forEach(osmPlace => {
       const isDuplicate = combined.some(p => {
@@ -1145,13 +1198,16 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
           <p style="font-size:0.88rem;color:var(--text-muted);max-width:440px;margin:0 auto 16px auto;">
             ${this.selectedRadius !== 'all' && this.currentLocation
               ? `No safe places were found within <strong>${this.selectedRadius} km</strong> of ${this.currentLocation.name}. Try expanding the radius to <strong>25 km</strong> or searching a nearby major city.`
-              : `Try selecting "All Safe Places" or clearing your search query to view the complete directory.`}
+              : `Try selecting "All Safe Facilities" or clearing your search query to view the complete directory.`}
           </p>
           <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
             <button class="btn btn-sm btn-primary" onclick="NearbyPlaces.resetRadiusAndFilters()">
               🔄 Reset Filters
             </button>
-            <button class="btn btn-sm btn-secondary" onclick="NearbyPlaces.openCurrentSearchInGoogleMaps()">
+            <button class="btn btn-sm btn-secondary" onclick="NearbyPlaces.searchCurrentMapArea()">
+              🗺️ Search Visible Map Area
+            </button>
+            <button class="btn btn-sm btn-outline" onclick="NearbyPlaces.openCurrentSearchInGoogleMaps()">
               🌐 Search on Google Maps
             </button>
           </div>
@@ -1169,6 +1225,10 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
       const sourceBadge = p.sourceType === 'osm_live'
         ? `<span class="badge" style="background:#e0f2fe;color:#0369a1;font-size:0.72rem;font-weight:600;">🌐 OpenStreetMap Live</span>`
         : `<span class="badge" style="background:#dcfce7;color:#15803d;font-size:0.72rem;font-weight:600;">🛡️ Verified Directory</span>`;
+
+      const callButton = p.hasRealPhone !== false && p.phone.replace(/[^0-9+]/g, '').length >= 3
+        ? `<a href="tel:${p.phone.replace(/[^0-9+]/g, '')}" class="btn btn-sm btn-primary" title="Opens phone dialer">📞 Call</a>`
+        : `<button type="button" class="btn btn-sm btn-secondary" disabled style="opacity:0.6;" title="Phone number unlisted in OpenStreetMap">📞 Phone Unlisted</button>`;
 
       return `
         <article class="place-card ${this.selectedPlaceId === p.id ? 'highlighted' : ''}" id="card-place-${p.id}">
@@ -1197,14 +1257,14 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
             <div class="place-meta-item">
               <span class="meta-icon">📞</span>
               <span class="meta-text">
-                <a href="tel:${p.phone.replace(/[^0-9+]/g, '')}" class="phone-link">
-                  <strong>${p.phone}</strong>
-                </a>
+                ${p.hasRealPhone !== false && p.phone.replace(/[^0-9+]/g, '').length >= 3
+                  ? `<a href="tel:${p.phone.replace(/[^0-9+]/g, '')}" class="phone-link"><strong>${p.phone}</strong></a>`
+                  : `<span style="color:var(--text-muted);">${p.phone}</span>`}
                 ${p.altPhone ? ` • Alt: <a href="tel:${p.altPhone.replace(/[^0-9+]/g, '')}">${p.altPhone}</a>` : ''}
               </span>
             </div>
 
-            ${p.serviceType ? `<div style="font-size:0.78rem;font-weight:600;color:var(--primary);margin-bottom:6px;">🏷️ Service: ${p.serviceType}</div>` : ''}
+            ${p.serviceType ? `<div style="font-size:0.78rem;font-weight:600;color:var(--primary);margin-bottom:6px;">🏷️ Type: ${p.serviceType}</div>` : ''}
 
             <div class="place-admission-box">
               <div class="admission-label">🛡️ Verification & Intake Protocol:</div>
@@ -1217,9 +1277,7 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
           </div>
 
           <div class="place-actions">
-            <a href="tel:${p.phone.replace(/[^0-9+]/g, '')}" class="btn btn-sm btn-primary" title="Opens phone dialer">
-              📞 Call Now
-            </a>
+            ${callButton}
             <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary">
               🧭 Get Directions
             </a>
@@ -1283,10 +1341,11 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
         zoomControl: true
       });
 
-      // Free, Open-Source OpenStreetMap Tiles
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+      // Configurable OpenStreetMap Tiles with required attribution
+      L.tileLayer(this.config.tileLayerUrl, {
+        maxZoom: this.config.maxZoom,
+        minZoom: this.config.minZoom,
+        attribution: this.config.attribution
       }).addTo(this.leafletMap);
 
       // CLICK MAP TO DROP PIN:
@@ -1296,10 +1355,10 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
         this.setUserCoordinates(e.latlng.lat, e.latlng.lng, 'Pinned Point on Map', false);
       });
 
-      // Handle resize when switching tabs
+      // Invalidate size after layout completes
       setTimeout(() => {
         if (this.leafletMap) this.leafletMap.invalidateSize();
-      }, 200);
+      }, 150);
 
       this.leafletInitialized = true;
       return true;
@@ -1402,6 +1461,9 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
     const categoryColors = {
       hospital: '#0d9488',
       emergency: '#dc2626',
+      clinic: '#0284c7',
+      pharmacy: '#16a34a',
+      doctor: '#4f46e5',
       shelter: '#d97706',
       ngo: '#7c3aed',
       survivor_support: '#e11d48',
@@ -1442,7 +1504,9 @@ Tip: You can tap or click anywhere on the Leaflet map to place your pin manually
             ${p.admissionNote}
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <a href="tel:${p.phone.replace(/[^0-9+]/g, '')}" class="btn btn-sm btn-primary" style="padding:4px 8px;font-size:0.76rem;">📞 Call</a>
+            ${p.hasRealPhone !== false && p.phone.replace(/[^0-9+]/g, '').length >= 3
+              ? `<a href="tel:${p.phone.replace(/[^0-9+]/g, '')}" class="btn btn-sm btn-primary" style="padding:4px 8px;font-size:0.76rem;">📞 Call</a>`
+              : ''}
             <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" style="padding:4px 8px;font-size:0.76rem;">🧭 Directions</a>
           </div>
         </div>
