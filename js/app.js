@@ -337,12 +337,21 @@ const App = {
     const chatBtn = document.getElementById('btnSendChat');
     const chatBox = document.getElementById('chatMessages');
 
+    const scrollChatToLatest = () => {
+      if (typeof chatBox.scrollTo === 'function') {
+        chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+      } else {
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    };
+
     const appendMsg = (sender, text) => {
       const bubble = document.createElement('div');
       bubble.className = `chat-bubble ${sender}`;
       bubble.textContent = text;
       chatBox.appendChild(bubble);
-      chatBox.scrollTop = chatBox.scrollHeight;
+      scrollChatToLatest();
+      return bubble;
     };
 
     const handleSend = () => {
@@ -351,10 +360,18 @@ const App = {
       appendMsg('user', text);
       chatInput.value = '';
 
+      // Show a short "typing" bubble so the reply feels natural, then swap in the answer
+      const typingBubble = appendMsg('bot', 'Typing…');
+      typingBubble.style.opacity = '0.65';
+      typingBubble.style.fontStyle = 'italic';
+
       setTimeout(() => {
         const reply = MentalHealth.getBotResponse(text);
-        appendMsg('bot', reply);
-      }, 400);
+        typingBubble.textContent = reply;
+        typingBubble.style.opacity = '';
+        typingBubble.style.fontStyle = '';
+        scrollChatToLatest();
+      }, 600);
     };
 
     if (chatBtn && chatInput) {
