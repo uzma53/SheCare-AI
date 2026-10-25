@@ -537,5 +537,32 @@ class SheCareVerificationTests(unittest.TestCase):
         index_html = get_source_content('index.html')
         self.assertIn('id="nearbyCountryPills"', index_html)
 
+
+    # -------------------------------------------------------------
+    # 20. Leaflet.js & OpenStreetMap Interactive Engine Integration
+    # -------------------------------------------------------------
+    def test_22_leaflet_osm_interactive_engine(self):
+        """Verify Leaflet.js is integrated with OpenStreetMap tiles, radius circles, and map-click location."""
+        nearby_code = get_source_content(os.path.join('js', 'nearby_places.js'))
+        index_html = get_source_content('index.html')
+
+        # Check Leaflet CDN in index.html
+        self.assertIn('leaflet@1.9.4', index_html)
+        self.assertIn('leaflet.js', index_html)
+        self.assertIn('leaflet.css', index_html)
+
+        # Check Leaflet OSM tile integration in nearby_places.js
+        self.assertIn('https://tile.openstreetmap.org/{z}/{x}/{y}.png', nearby_code)
+        self.assertIn('OpenStreetMap', nearby_code)
+        self.assertIn('L.map', nearby_code)
+        self.assertIn('initLeafletMap()', nearby_code)
+
+        # Check map-click location setter (solves location enable issue)
+        self.assertIn("this.leafletMap.on('click'", nearby_code)
+        self.assertIn('setUserCoordinates', nearby_code)
+
+        # Check search radius circle plotting on Leaflet map
+        self.assertIn('L.circle(userLatLng', nearby_code)
+
 if __name__ == '__main__':
     unittest.main()
