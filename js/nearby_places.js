@@ -5,7 +5,7 @@
  * Overpass API Live Healthcare, Police & Shelter Search and Nominatim Geocoding.
  * 
  * Categories:
- * 1. Police & Security Agencies (15 / Safe City)
+ * 1. Police & Security Agencies (15 / Safe City))
  * 2. Rescue 1122 & Ambulance Stations
  * 3. Nearby Hospitals & Medical Centres
  * 4. Emergency & Casualty Trauma Wards
