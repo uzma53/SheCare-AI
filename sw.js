@@ -3,7 +3,7 @@
  * Ensures full caching and offline operation without network connectivity.
  * Implements safe MIME fallbacks for static hosting (GitHub Pages).
  */
-const CACHE_NAME = 'shecare-v2.2';
+const CACHE_NAME = 'shecare-v2.3';
 const STATIC_ASSETS = [
   './',
   './index.html',
