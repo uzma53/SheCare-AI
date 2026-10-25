@@ -70,7 +70,14 @@ const App = {
     });
 
     if (viewId === 'view-nearby-places' && typeof NearbyPlaces !== 'undefined') {
-      setTimeout(() => NearbyPlaces.applyFiltersAndRender(), 50);
+      setTimeout(() => {
+        if (!NearbyPlaces.leafletInitialized) {
+          NearbyPlaces.initLeafletMap();
+        } else if (NearbyPlaces.leafletMap) {
+          NearbyPlaces.leafletMap.invalidateSize();
+        }
+        NearbyPlaces.applyFiltersAndRender();
+      }, 100);
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
