@@ -379,7 +379,8 @@ DISPATCHED VIA: SheCare AI Emergency System`;
   // Copy full report to clipboard
   copyReportToClipboard() {
     const reportText = this.generateReportText();
-    navigator.clipboard.writeText(reportText).then(() => {
+
+    const onSuccess = () => {
       const btn = document.getElementById('btnAgencyCopyReport');
       if (btn) {
         const orig = btn.innerHTML;
@@ -389,9 +390,40 @@ DISPATCHED VIA: SheCare AI Emergency System`;
       if (typeof App !== 'undefined' && App.showToast) {
         App.showToast('Emergency Report & Location copied to clipboard!', 'success');
       }
-    }).catch(err => {
+    };
+
+    const onFail = () => {
       alert('Could not copy automatically. You can copy the text manually from the preview box.');
-    });
+    };
+
+    // navigator.clipboard only exists on secure pages (https / localhost). On plain http://<LAN-ip>
+    // or file:// it is undefined and the old code crashed silently - fall back to execCommand.
+    const legacyCopy = () => {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = reportText;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, ta.value.length);
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    };
+
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      navigator.clipboard.writeText(reportText).then(onSuccess).catch(() => {
+        if (legacyCopy()) onSuccess(); else onFail();
+      });
+    } else if (legacyCopy()) {
+      onSuccess();
+    } else {
+      onFail();
+    }
   },
 
   // Native Share
