@@ -1,7 +1,10 @@
 /**
  * SurvivorCare AI / SheCare AI - Nearby Help & Safe Places Engine
  * 
- * Secure, privacy-conscious locator for:
+ * Powered by Leaflet.js & OpenStreetMap (Zero-API-Key, Open-Source Interactive Map)
+ * with Optional Google Maps Platform Integration.
+ * 
+ * Categories:
  * 1. Nearby Hospitals
  * 2. Emergency Departments
  * 3. Women's Shelters & Safe Accommodation
@@ -10,13 +13,14 @@
  * 6. Counselling and Mental-Health Services
  * 7. Relevant Legal-Aid Services
  * 
- * Privacy & Security:
+ * Location Privacy & Usability:
  * - Geolocation is 100% strictly optional.
- * - Coordinates are processed exclusively inside browser memory and NEVER transmitted
- *   to any remote server or third-party tracking entity.
- * - Manual city/district search is always available.
- * - Offline-first fallback: Functions fully without an external Google Maps API key,
- *   using verified directory data, interactive visual map pins, and direct Google Maps links.
+ * - Coordinates remain strictly inside browser memory.
+ * - Survivors can easily set their location by:
+ *   1. Clicking "📍 Use My Current Location" (Browser GPS)
+ *   2. Clicking ANYWHERE on the Leaflet map to drop their pin!
+ *   3. Clicking quick city shortcuts (Lahore, Karachi, Islamabad, Delhi, Mumbai, etc.)
+ *   4. Typing any city or district into the search bar.
  */
 
 const NearbyPlaces = {
@@ -55,7 +59,7 @@ const NearbyPlaces = {
     { id: 'all', label: 'All Safe Places', icon: '📍' },
     { id: 'hospital', label: 'Hospitals', icon: '🏥' },
     { id: 'emergency', label: 'Emergency Departments', icon: '🚨' },
-    { id: 'shelter', label: 'Women\'s Shelters', icon: '🏡' },
+    { id: 'shelter', label: 'Women's Shelters', icon: '🏡' },
     { id: 'ngo', label: 'Support Centres & NGOs', icon: '🤝' },
     { id: 'survivor_support', label: 'Survivor Support', icon: '🛡️' },
     { id: 'counselling', label: 'Counselling & Mental Health', icon: '🧠' },
@@ -63,14 +67,10 @@ const NearbyPlaces = {
   ],
 
   // Verified Directory of Real Facilities (Pakistan, India, International)
-  // Transparent admissions notes, verified sources, and real contacts
   verifiedPlaces: [
     // --- PAKISTAN ---
     {
       id: 'pk-panah-karachi',
-      lastVerified: 'October 2026',
-      serviceType: 'Confidential Safe Shelter & Psychosocial Rehabilitation',
-      capacityNotice: 'Capacity varies daily. No guarantee of immediate bed space; phone intake required before arrival.',,
       name: 'Panah Shelter Home (Panah Trust)',
       category: 'shelter',
       country: 'Pakistan',
@@ -82,14 +82,14 @@ const NearbyPlaces = {
       altPhone: '+92 300 0702624',
       hours: '24/7 Crisis Admission & Safe Accommodation',
       verifiedSource: 'Panah Charitable Trust / Sindh Social Welfare Department',
+      lastVerified: 'October 2026',
+      serviceType: 'Confidential Safe Shelter & Psychosocial Rehabilitation',
+      capacityNotice: 'Capacity varies daily. No guarantee of immediate bed space; phone intake required before arrival.',
       admissionNote: 'Strictly confidential admission for female survivors of domestic and sexual violence. Call ahead or arrive with authorized referral/police assistance.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Panah+Shelter+Home+Karachi'
     },
     {
       id: 'pk-dastak-lahore',
-      lastVerified: 'October 2026',
-      serviceType: 'Crisis Refuge, Legal Litigation & Survivor Accompaniment',
-      capacityNotice: 'Strict security intake. Admission requires advance telephone screening.',,
       name: 'Dastak Charitable Trust Shelter for Women',
       category: 'shelter',
       country: 'Pakistan',
@@ -101,14 +101,14 @@ const NearbyPlaces = {
       altPhone: '+92 42 3518 8492',
       hours: '24/7 Crisis Shelter Intake',
       verifiedSource: 'Dastak Charitable Trust (Founded by Asma Jahangir)',
+      lastVerified: 'October 2026',
+      serviceType: 'Crisis Refuge, Legal Litigation & Survivor Accompaniment',
+      capacityNotice: 'Strict security intake. Admission requires advance telephone screening.',
       admissionNote: 'Safe shelter providing emergency housing, free legal aid, and trauma counseling. Prior intake phone call strongly recommended for secure admission.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Dastak+Charitable+Trust+Lahore'
     },
     {
       id: 'pk-edhi-shelter-karachi',
-      lastVerified: 'October 2026',
-      serviceType: 'Unconditional Emergency Refuge & 24/7 Ambulance Fleet (115)',
-      capacityNotice: '24/7 open casualty intake. Ambulance transport available nationwide.',,
       name: 'Bilquis Edhi Home & Crisis Shelter',
       category: 'shelter',
       country: 'Pakistan',
@@ -120,14 +120,14 @@ const NearbyPlaces = {
       altPhone: '115',
       hours: '24 Hours / 7 Days Open Emergency Reception',
       verifiedSource: 'Edhi Foundation Trust (Registered National Charity)',
+      lastVerified: 'October 2026',
+      serviceType: 'Unconditional Emergency Refuge & 24/7 Ambulance Fleet (115)',
+      capacityNotice: '24/7 open casualty intake. Ambulance transport available nationwide.',
       admissionNote: 'Unconditional safe haven for distressed, abused, or abandoned women and children. 24/7 national ambulance service available via 115.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Edhi+Home+Mithadar+Karachi'
     },
     {
       id: 'pk-bb-crisis-islamabad',
-      lastVerified: 'October 2026',
-      serviceType: 'Government One-Window Crisis & Inter-Agency Coordination',
-      capacityNotice: 'Short-term crisis protection (up to 72h) with medical/police linkage.',,
       name: 'Shaheed Benazir Bhutto One-Window Crisis Centre',
       category: 'shelter',
       country: 'Pakistan',
@@ -139,14 +139,14 @@ const NearbyPlaces = {
       altPhone: '1099',
       hours: '24/7 Integrated Emergency Service',
       verifiedSource: 'Ministry of Human Rights (MOHR), Government of Pakistan',
+      lastVerified: 'October 2026',
+      serviceType: 'Government One-Window Crisis & Inter-Agency Coordination',
+      capacityNotice: 'Short-term crisis protection (up to 72h) with medical/police linkage.',
       admissionNote: 'Federal one-window crisis facility integrating temporary accommodation, medical examination, psychological first aid, and direct legal referral.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Shaheed+Benazir+Bhutto+Crisis+Centre+Islamabad'
     },
     {
       id: 'pk-jpmc-karachi',
-      lastVerified: 'October 2026',
-      serviceType: 'Tertiary Public Hospital, 24/7 Medico-Legal Care & HIV PEP',
-      capacityNotice: '24/7 Emergency Department open for acute assault triage & forensics.',,
       name: 'Jinnah Postgraduate Medical Centre (JPMC) - Medico-Legal Emergency',
       category: 'emergency',
       country: 'Pakistan',
@@ -158,14 +158,14 @@ const NearbyPlaces = {
       altPhone: '+92 21 9920 1301',
       hours: '24/7 Open Emergency Department & Medico-Legal Center',
       verifiedSource: 'Government of Sindh Health Department / JPMC Trauma Centre',
+      lastVerified: 'October 2026',
+      serviceType: 'Tertiary Public Hospital, 24/7 Medico-Legal Care & HIV PEP',
+      capacityNotice: '24/7 Emergency Department open for acute assault triage & forensics.',
       admissionNote: 'Public tertiary hospital with 24/7 female Medico-Legal Officers (MLO), emergency post-assault forensic documentation, emergency contraception, and HIV PEP.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Jinnah+Postgraduate+Medical+Centre+Karachi'
     },
     {
       id: 'pk-services-lahore',
-      lastVerified: 'October 2026',
-      serviceType: 'Apex Public Emergency, Gynecology Trauma & MLO Cell',
-      capacityNotice: '24/7 Open casualty. Post-assault trauma documentation available.',,
       name: 'Services Hospital Emergency & Medicolegal Centre',
       category: 'emergency',
       country: 'Pakistan',
@@ -177,14 +177,14 @@ const NearbyPlaces = {
       altPhone: '1122',
       hours: '24/7 Open Emergency & Forensic Examination Unit',
       verifiedSource: 'Punjab Specialized Healthcare & Medical Education Department',
+      lastVerified: 'October 2026',
+      serviceType: 'Apex Public Emergency, Gynecology Trauma & MLO Cell',
+      capacityNotice: '24/7 Open casualty. Post-assault trauma documentation available.',
       admissionNote: 'Full 24/7 emergency triage, certified rape trauma examination unit, emergency obstetrics/gynecology, and injury stabilization.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Services+Hospital+Emergency+Lahore'
     },
     {
       id: 'pk-pims-islamabad',
-      lastVerified: 'October 2026',
-      serviceType: 'Federal Apex Hospital, Rape Forensic Kits & Surgical Triage',
-      capacityNotice: '24/7 Emergency casualty care open for acute injuries.',,
       name: 'Pakistan Institute of Medical Sciences (PIMS) Emergency',
       category: 'emergency',
       country: 'Pakistan',
@@ -196,14 +196,14 @@ const NearbyPlaces = {
       altPhone: '+92 51 926 1179',
       hours: '24/7 Apex Emergency Care',
       verifiedSource: 'Federal Ministry of National Health Services, Islamabad',
+      lastVerified: 'October 2026',
+      serviceType: 'Federal Apex Hospital, Rape Forensic Kits & Surgical Triage',
+      capacityNotice: '24/7 Emergency casualty care open for acute injuries.',
       admissionNote: 'Federal apex emergency hospital. 24/7 Medico-Legal Officer on duty, forensic rape examination kit, post-exposure prophylaxis (PEP), and acute surgical care.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=PIMS+Hospital+Emergency+Islamabad'
     },
     {
       id: 'pk-mayo-lahore',
-      lastVerified: 'October 2026',
-      serviceType: 'Public Inpatient Teaching Hospital & Surgical Casualty',
-      capacityNotice: '24/7 Emergency department admission.',,
       name: 'Mayo Hospital Emergency & Trauma Care',
       category: 'hospital',
       country: 'Pakistan',
@@ -215,14 +215,14 @@ const NearbyPlaces = {
       altPhone: '1122',
       hours: '24/7 Inpatient & Outpatient Emergency',
       verifiedSource: 'King Edward Medical University / Punjab Health Dept',
+      lastVerified: 'October 2026',
+      serviceType: 'Public Inpatient Teaching Hospital & Surgical Casualty',
+      capacityNotice: '24/7 Emergency department admission.',
       admissionNote: 'Largest public teaching hospital in Punjab. Complete surgical, gynecological, psychiatric, and trauma departments.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Mayo+Hospital+Lahore'
     },
     {
       id: 'pk-civil-karachi',
-      lastVerified: 'October 2026',
-      serviceType: 'Public Emergency, Medico-Legal Examination & Prophylaxis',
-      capacityNotice: '24/7 Acute casualty intake.',,
       name: 'Dr. Ruth K.M. Pfau Civil Hospital Emergency',
       category: 'hospital',
       country: 'Pakistan',
@@ -234,14 +234,14 @@ const NearbyPlaces = {
       altPhone: '+92 21 9921 5741',
       hours: '24 Hours Daily',
       verifiedSource: 'Sindh Health Services / DUHS',
+      lastVerified: 'October 2026',
+      serviceType: 'Public Emergency, Medico-Legal Examination & Prophylaxis',
+      capacityNotice: '24/7 Acute casualty intake.',
       admissionNote: 'Major public emergency and specialized gynecology hospital with round-the-clock medicolegal staff and HIV prophylaxis resources.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Civil+Hospital+Karachi'
     },
     {
       id: 'pk-rozan-islamabad',
-      lastVerified: 'October 2026',
-      serviceType: 'Specialized Trauma Counseling & Sexual Violence Psychosocial Support',
-      capacityNotice: 'Daytime telephonic & in-person counselling; callback queue active.',,
       name: 'Rozan Crisis Counselling & Psycho-Social Support',
       category: 'counselling',
       country: 'Pakistan',
@@ -253,14 +253,14 @@ const NearbyPlaces = {
       altPhone: '0800 22444',
       hours: 'Mon-Sat 9:00 AM - 5:00 PM (Emergency callbacks active)',
       verifiedSource: 'Rozan NGO (Trauma Support & Gender Violence Specialist)',
+      lastVerified: 'October 2026',
+      serviceType: 'Specialized Trauma Counseling & Sexual Violence Psychosocial Support',
+      capacityNotice: 'Daytime telephonic & in-person counselling; callback queue active.',
       admissionNote: 'Trauma-informed survivor counselling, specialized emotional support for survivors of sexual assault and domestic violence, and safe referral coordination.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Rozan+Islamabad'
     },
     {
       id: 'pk-madadgaar-karachi',
-      lastVerified: 'October 2026',
-      serviceType: 'Nationwide 24/7 Crisis Hotline & Rapid Shelter Referral',
-      capacityNotice: 'Immediate helpline dispatch and shelter referral coordination.',,
       name: 'Madadgaar National Helpline & Referral Center',
       category: 'survivor_support',
       country: 'Pakistan',
@@ -272,14 +272,14 @@ const NearbyPlaces = {
       altPhone: '+92 21 3504 4444',
       hours: '24/7 Crisis Call & Referral Center',
       verifiedSource: 'Lawyers for Human Rights & Legal Aid (LHRLA) / UNICEF Partner',
+      lastVerified: 'October 2026',
+      serviceType: 'Nationwide 24/7 Crisis Hotline & Rapid Shelter Referral',
+      capacityNotice: 'Immediate helpline dispatch and shelter referral coordination.',
       admissionNote: 'Nationwide crisis intervention, emergency legal support, safe shelter transport linkages, and rapid child/women rescue operations.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Madadgaar+Helpline+Karachi'
     },
     {
       id: 'pk-aghs-lahore',
-      lastVerified: 'October 2026',
-      serviceType: 'Pro-Bono Legal Litigation, Protection Orders & Court Representation',
-      capacityNotice: 'Office appointments during legal business hours; emergency court filings supported.',,
       name: 'AGHS Legal Aid Cell (Asma Jahangir Legal Aid)',
       category: 'legal_aid',
       country: 'Pakistan',
@@ -291,6 +291,9 @@ const NearbyPlaces = {
       altPhone: '+92 42 3588 3645',
       hours: 'Mon-Fri 9:00 AM - 5:00 PM',
       verifiedSource: 'AGHS Legal Aid Cell (Human Rights Commission of Pakistan Alliance)',
+      lastVerified: 'October 2026',
+      serviceType: 'Pro-Bono Legal Litigation, Protection Orders & Court Representation',
+      capacityNotice: 'Office appointments during legal business hours; emergency court filings supported.',
       admissionNote: 'Free pro-bono litigation, police reporting assistance, court protection orders, and legal representation for survivors of rape and domestic brutality.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=AGHS+Legal+Aid+Cell+Lahore'
     },
@@ -307,6 +310,9 @@ const NearbyPlaces = {
       altPhone: '1043',
       hours: '24/7 Safe Emergency Protection',
       verifiedSource: 'Punjab Social Welfare Department / District Government Multan',
+      lastVerified: 'October 2026',
+      serviceType: 'Safe Crisis Shelter, First Aid & Legal Linkages',
+      capacityNotice: 'Government Dar-ul-Aman facility; intake subject to security verification.',
       admissionNote: 'Government Dar-ul-Aman shelter offering safe shelter, medical first aid, and legal assistance for vulnerable women.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Dar-ul-Aman+Multan'
     },
@@ -323,6 +329,9 @@ const NearbyPlaces = {
       altPhone: '1122',
       hours: '24/7 Emergency Care',
       verifiedSource: 'Khyber Pakhtunkhwa Health Department',
+      lastVerified: 'October 2026',
+      serviceType: 'Apex Trauma Emergency & 24/7 MLO Casualty Services',
+      capacityNotice: '24/7 Open casualty & trauma surgery.',
       admissionNote: 'Primary public tertiary emergency center in KPK. 24/7 Medico-Legal casualty services, emergency gynecology, and surgical trauma care.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Lady+Reading+Hospital+Peshawar'
     },
@@ -330,9 +339,6 @@ const NearbyPlaces = {
     // --- INDIA ---
     {
       id: 'in-sakhi-delhi',
-      lastVerified: 'October 2026',
-      serviceType: 'Integrated One Stop Crisis Centre, Medical Aid & Safe Stay',
-      capacityNotice: 'Temporary safe stay up to 5 days; long-term shelter transfer coordination.',,
       name: 'Sakhi One Stop Centre (OSC) - New Delhi',
       category: 'shelter',
       country: 'India',
@@ -344,15 +350,15 @@ const NearbyPlaces = {
       altPhone: '+91 11 2331 7004',
       hours: '24/7 Integrated Emergency Service & Safe Stay',
       verifiedSource: 'Ministry of Women and Child Development (MWCD), Govt of India',
+      lastVerified: 'October 2026',
+      serviceType: 'Integrated One Stop Crisis Centre, Medical Aid & Safe Stay',
+      capacityNotice: 'Temporary safe stay up to 5 days; long-term shelter transfer coordination.',
       admissionNote: 'Official One Stop Centre providing medical aid, police facilitation, psycho-social counselling, legal aid, and temporary safe accommodation (up to 5 days).',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sakhi+One+Stop+Centre+Delhi'
     },
     {
       id: 'in-jagori-delhi',
-      lastVerified: 'October 2026',
-      serviceType: 'Crisis Intervention, Safety Planning & Institutional Referrals',
-      capacityNotice: 'Helpline active Monday-Friday; emergency shelter referrals.',,
-      name: 'Jagori Women\'s Crisis & Safety Center',
+      name: 'Jagori Women's Crisis & Safety Center',
       category: 'survivor_support',
       country: 'India',
       city: 'New Delhi',
@@ -363,14 +369,14 @@ const NearbyPlaces = {
       altPhone: '+91 8800 360 400',
       hours: 'Mon-Fri 9:30 AM - 5:30 PM (Helpline active)',
       verifiedSource: 'Jagori NGO (Established 1984, Delhi Safety Audit Leader)',
+      lastVerified: 'October 2026',
+      serviceType: 'Crisis Intervention, Safety Planning & Institutional Referrals',
+      capacityNotice: 'Helpline active Monday-Friday; emergency shelter referrals.',
       admissionNote: 'Survivor counseling, crisis intervention, safety planning, and referral to partner shelters and public hospitals across the Delhi NCR region.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Jagori+Malviya+Nagar+Delhi'
     },
     {
       id: 'in-sneha-mumbai',
-      lastVerified: 'October 2026',
-      serviceType: 'Gender Violence Response, Hospital Accompaniment & Crisis Care',
-      capacityNotice: '24/7 Crisis helpline response with municipal hospital coordination.',,
       name: 'SNEHA Crisis Center & Gender Violence Cell',
       category: 'survivor_support',
       country: 'India',
@@ -382,15 +388,15 @@ const NearbyPlaces = {
       altPhone: '+91 91675 35761',
       hours: '24/7 Crisis Response & Counselling',
       verifiedSource: 'Society for Nutrition, Education and Health Action (SNEHA) & MCGM',
+      lastVerified: 'October 2026',
+      serviceType: 'Gender Violence Response, Hospital Accompaniment & Crisis Care',
+      capacityNotice: '24/7 Crisis helpline response with municipal hospital coordination.',
       admissionNote: 'Trauma counseling, hospital emergency accompaniment, safe shelter referral, and legal guidance for survivors of sexual and domestic violence.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=SNEHA+Sion+Mumbai'
     },
     {
       id: 'in-vimochana-bengaluru',
-      lastVerified: 'October 2026',
-      serviceType: 'Safe Refuge (Angala), Legal Counseling & Crisis Defense',
-      capacityNotice: 'Confidential shelter intake subject to space and safety assessment.',,
-      name: 'Vimochana Forum for Women\'s Rights & Crisis Shelter',
+      name: 'Vimochana Forum for Women's Rights & Crisis Shelter',
       category: 'shelter',
       country: 'India',
       city: 'Bengaluru',
@@ -400,15 +406,15 @@ const NearbyPlaces = {
       phone: '+91 80 2549 2781',
       altPhone: '+91 80 2549 4230',
       hours: '24/7 Emergency Crisis Intake',
-      verifiedSource: 'Vimochana Autonomous Women\'s Collective (Active since 1979)',
+      verifiedSource: 'Vimochana Autonomous Women's Collective (Active since 1979)',
+      lastVerified: 'October 2026',
+      serviceType: 'Safe Refuge (Angala), Legal Counseling & Crisis Defense',
+      capacityNotice: 'Confidential shelter intake subject to space and safety assessment.',
       admissionNote: 'Safe shelter (Angala crisis refuge), emergency crisis intervention, legal aid counseling, and emotional rehabilitation for women facing violence.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Vimochana+Bengaluru'
     },
     {
       id: 'in-aiims-delhi',
-      lastVerified: 'October 2026',
-      serviceType: 'National Apex Emergency, Forensic Examination & Contraception/PEP',
-      capacityNotice: '24/7 Open Apex trauma emergency.',,
       name: 'All India Institute of Medical Sciences (AIIMS) Apex Emergency',
       category: 'emergency',
       country: 'India',
@@ -420,14 +426,14 @@ const NearbyPlaces = {
       altPhone: '+91 11 2659 4405',
       hours: '24/7 Apex Emergency & Trauma Center',
       verifiedSource: 'AIIMS New Delhi / Ministry of Health and Family Welfare',
+      lastVerified: 'October 2026',
+      serviceType: 'National Apex Emergency, Forensic Examination & Contraception/PEP',
+      capacityNotice: '24/7 Open Apex trauma emergency.',
       admissionNote: 'National apex hospital. 24/7 emergency medical treatment, clinical forensic examination, STI/HIV prophylaxis, and emergency contraception.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=AIIMS+Emergency+New+Delhi'
     },
     {
       id: 'in-kem-mumbai',
-      lastVerified: 'October 2026',
-      serviceType: 'Public Trauma Emergency & Medico-Legal Examination Unit',
-      capacityNotice: '24/7 Open casualty.',,
       name: 'King Edward Memorial (KEM) Hospital Emergency',
       category: 'emergency',
       country: 'India',
@@ -439,15 +445,15 @@ const NearbyPlaces = {
       altPhone: '+91 22 2413 6051',
       hours: '24/7 Emergency Services',
       verifiedSource: 'Municipal Corporation of Greater Mumbai (MCGM)',
+      lastVerified: 'October 2026',
+      serviceType: 'Public Trauma Emergency & Medico-Legal Examination Unit',
+      capacityNotice: '24/7 Open casualty.',
       admissionNote: '24/7 comprehensive trauma emergency, forensic medical examination, post-assault prophylaxis, and dedicated social worker crisis unit.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=KEM+Hospital+Parel+Mumbai'
     },
     {
       id: 'in-stjohns-bengaluru',
-      lastVerified: 'October 2026',
-      serviceType: 'Confidential Assault Treatment & Emergency Gynecology',
-      capacityNotice: '24/7 Emergency trauma department open.',,
-      name: 'St. John\'s Medical College Hospital Emergency',
+      name: 'St. John's Medical College Hospital Emergency',
       category: 'hospital',
       country: 'India',
       city: 'Bengaluru',
@@ -457,15 +463,15 @@ const NearbyPlaces = {
       phone: '+91 80 2206 5000',
       altPhone: '+91 80 2206 5169',
       hours: '24/7 Emergency & Acute Trauma Care',
-      verifiedSource: 'St. John\'s National Academy of Health Sciences',
-      admissionNote: '24/7 emergency medical care, confidential assault documentation, counseling, and direct referral to local women\'s support centers.',
+      verifiedSource: 'St. John's National Academy of Health Sciences',
+      lastVerified: 'October 2026',
+      serviceType: 'Confidential Assault Treatment & Emergency Gynecology',
+      capacityNotice: '24/7 Emergency trauma department open.',
+      admissionNote: '24/7 emergency medical care, confidential assault documentation, counseling, and direct referral to local women's support centers.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=St+Johns+Hospital+Koramangala+Bengaluru'
     },
     {
       id: 'in-majlis-mumbai',
-      lastVerified: 'October 2026',
-      serviceType: 'Pioneering Feminist Legal Aid, Criminal Defense & Court Support',
-      capacityNotice: 'Free legal counseling and protection order petitioning.',,
       name: 'Majlis Legal Centre for Women & Children',
       category: 'legal_aid',
       country: 'India',
@@ -477,14 +483,14 @@ const NearbyPlaces = {
       altPhone: '+91 99202 41254',
       hours: 'Mon-Sat 10:00 AM - 6:00 PM',
       verifiedSource: 'Majlis Legal Centre (Pioneering Feminist Legal Aid Organization)',
+      lastVerified: 'October 2026',
+      serviceType: 'Pioneering Feminist Legal Aid, Criminal Defense & Court Support',
+      capacityNotice: 'Free legal counseling and protection order petitioning.',
       admissionNote: 'Specialized team of women lawyers providing free litigation support, police station intervention, protection orders, and courtroom representation.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Majlis+Legal+Centre+Mumbai'
     },
     {
       id: 'in-ncw-delhi',
-      lastVerified: 'October 2026',
-      serviceType: '24/7 National Commission for Women Emergency Cell (7827170170)',
-      capacityNotice: 'Nationwide administrative escalation to district superintendents of police.',,
       name: 'National Commission for Women (NCW) Emergency Cell',
       category: 'counselling',
       country: 'India',
@@ -496,6 +502,9 @@ const NearbyPlaces = {
       altPhone: '+91 11 2694 2369',
       hours: '24/7 Emergency Violence Helpline & Coordination',
       verifiedSource: 'National Commission for Women, Statutory Body Govt of India',
+      lastVerified: 'October 2026',
+      serviceType: '24/7 National Commission for Women Emergency Cell (7827170170)',
+      capacityNotice: 'Nationwide administrative escalation to district superintendents of police.',
       admissionNote: 'Direct coordination with district police, One Stop Centres, and shelter homes nationwide for immediate survivor intervention.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=National+Commission+for+Women+New+Delhi'
     },
@@ -503,9 +512,6 @@ const NearbyPlaces = {
     // --- INTERNATIONAL LIFELINES ---
     {
       id: 'intl-rainn-us',
-      lastVerified: 'October 2026',
-      serviceType: 'Confidential 24/7 Sexual Assault Hotline & Global Web Chat',
-      capacityNotice: '24/7 Free confidential crisis intervention.',,
       name: 'RAINN (Rape, Abuse & Incest National Network)',
       category: 'survivor_support',
       country: 'International',
@@ -517,25 +523,28 @@ const NearbyPlaces = {
       altPhone: 'online.rainn.org',
       hours: '24/7 Confidential Crisis Hotline & Web Chat',
       verifiedSource: 'RAINN (Largest Anti-Sexual Violence Organization in the United States)',
+      lastVerified: 'October 2026',
+      serviceType: 'Confidential 24/7 Sexual Assault Hotline & Global Web Chat',
+      capacityNotice: '24/7 Free confidential crisis intervention.',
       admissionNote: 'Confidential 24/7 trauma-informed crisis intervention, referrals to local SARCs (Sexual Assault Resource Centers) and medical clinics worldwide.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=RAINN+Washington+DC'
     },
     {
       id: 'intl-refuge-uk',
-      lastVerified: 'October 2026',
-      serviceType: 'National Safe Houses Network & 24/7 Domestic Abuse Helpline',
-      capacityNotice: 'Emergency refuge placement across the United Kingdom.'),
       name: 'Refuge National Domestic Abuse Centre & Safe Houses',
       category: 'shelter',
       country: 'International',
       city: 'London',
       lat: 51.5074,
       lng: -0.1278,
-      address: '4th Floor, International House, 1 St Katharine\'s Way, London, UK',
+      address: '4th Floor, International House, 1 St Katharine's Way, London, UK',
       phone: '0808 2000 247',
       altPhone: '+44 20 7395 7700',
       hours: '24/7 Freephone & Emergency Refuge Placement',
       verifiedSource: 'Refuge UK (Registered National Charity No. 277424)',
+      lastVerified: 'October 2026',
+      serviceType: 'National Safe Houses Network & 24/7 Domestic Abuse Helpline',
+      capacityNotice: 'Emergency refuge placement across the United Kingdom.',
       admissionNote: 'Provides access to safe houses and refuges across the UK for women and children escaping domestic abuse and sexual violence.',
       googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Refuge+London+UK'
     }
@@ -543,7 +552,7 @@ const NearbyPlaces = {
 
   // State
   currentLocation: null,      // { lat, lng, name, isGps }
-  selectedCountry: 'all',
+  selectedCountry: 'all',     // country id ('all' | 'Pakistan' | 'India' | 'International')
   selectedCategory: 'all',    // category id
   selectedRadius: 'all',      // 'all' | 5 | 10 | 25
   searchQuery: '',            // free text filter
@@ -552,6 +561,13 @@ const NearbyPlaces = {
   googleMapsLoaded: false,
   googleMapInstance: null,
   mapMarkers: [],
+
+  // Leaflet State
+  leafletMap: null,
+  leafletMarkers: [],
+  userLeafletMarker: null,
+  userRadiusCircle: null,
+  leafletInitialized: false,
 
   init() {
     // 1. Load stored Google Maps API Key if any
@@ -564,21 +580,22 @@ const NearbyPlaces = {
     // 2. Setup DOM event listeners
     this.setupEventListeners();
 
-    // 3. Render categories & radius pills
+    // 3. Render country, category & radius pills
+    this.renderCountryPills();
     this.renderCategoryChips();
     this.renderRadiusPills();
 
-    // 4. Initial render of list & map canvas
+    // 4. Initial render of list & map
     this.applyFiltersAndRender();
 
-    // 5. If API key exists, attempt loading Google Maps SDK
+    // 5. If Google Maps API key exists, attempt loading Google Maps SDK
     if (this.gmapsApiKey && !this.googleMapsLoaded) {
       this.loadGoogleMapsScript(this.gmapsApiKey);
     }
   },
 
   setupEventListeners() {
-    // Detect Location Button
+    // Detect Location Button (Browser GPS)
     const btnDetect = document.getElementById('btnDetectLocation');
     if (btnDetect) {
       btnDetect.addEventListener('click', () => this.requestGeolocation());
@@ -672,8 +689,7 @@ const NearbyPlaces = {
     }
   },
 
-  // Renders the Category Filter Buttons
-    // Renders the Country Filter Pills (Pakistan, India, International, All)
+  // Renders the Country Filter Pills (Pakistan, India, International, All)
   renderCountryPills() {
     const container = document.getElementById('nearbyCountryPills');
     if (!container) return;
@@ -693,6 +709,7 @@ const NearbyPlaces = {
     });
   },
 
+  // Renders the Category Filter Buttons
   renderCategoryChips() {
     const container = document.getElementById('nearbyCategoryChips');
     if (!container) return;
@@ -744,15 +761,21 @@ const NearbyPlaces = {
   // Geolocation with explicit survivor consent
   requestGeolocation() {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser. Please search manually by city or area name.');
+      alert('Browser geolocation is unavailable. You can click anywhere on the Leaflet map to place your pin, or choose a city shortcut.');
       return;
     }
 
     const consent = confirm(
-      'LOCATION SAFETY NOTICE:\n\n' +
-      '• SurvivorCare AI processes your coordinates strictly inside your browser.\n' +
-      '• Your location is NEVER sent to remote tracking servers or shared.\n' +
-      '• It is used solely to compute distance to nearby hospitals and safe shelters.\n\n' +
+      'LOCATION SAFETY NOTICE:
+
+' +
+      '• SurvivorCare AI processes your coordinates strictly inside your browser.
+' +
+      '• Your location is NEVER sent to remote tracking servers or shared.
+' +
+      '• It is used solely to compute distance to nearby safe facilities.
+
+' +
       'Proceed with browser location detection?'
     );
 
@@ -763,29 +786,55 @@ const NearbyPlaces = {
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        this.currentLocation = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          name: 'Current Device Location',
-          isGps: true
-        };
+        this.setUserCoordinates(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          'Current Device Location (GPS)',
+          true
+        );
         if (btn) btn.innerHTML = '📍 Use My Current Location';
-        this.updateLocationStatusUI();
-        this.applyFiltersAndRender();
-        if (typeof App !== 'undefined' && App.showToast) {
-          App.showToast('Location updated safely (device-local only).', 'success');
-        }
       },
       (err) => {
         if (btn) btn.innerHTML = '📍 Use My Current Location';
-        let msg = 'Unable to retrieve location. ';
-        if (err.code === 1) msg += 'Permission denied by user or browser.';
-        else if (err.code === 2) msg += 'Position unavailable.';
-        else if (err.code === 3) msg += 'Location request timed out.';
-        alert(msg + '\nYou can search by city or district name using the manual search bar.');
+        let msg = 'Unable to access device location automatically: ';
+        if (err.code === 1) {
+          msg += 'Location permission was denied in your browser settings.';
+        } else if (err.code === 2) {
+          msg += 'Position unavailable.';
+        } else {
+          msg += 'Request timed out.';
+        }
+        
+        alert(
+          msg + '\n\n' +
+          '💡 EASY ALTERNATIVE:\n' +
+          '1. Simply CLICK anywhere on the interactive map to place your pin!\n' +
+          '2. Or click any quick city button below (Lahore, Karachi, Delhi, etc.).'
+        );
       },
       { timeout: 10000, enableHighAccuracy: true, maximumAge: 60000 }
     );
+  },
+
+  // Set user coordinates from GPS, Map Click, or Search
+  setUserCoordinates(lat, lng, name = 'Selected Location', isGps = false) {
+    this.currentLocation = {
+      lat: Math.round(lat * 10000) / 10000,
+      lng: Math.round(lng * 10000) / 10000,
+      name: name,
+      isGps: isGps
+    };
+
+    this.updateLocationStatusUI();
+    this.applyFiltersAndRender();
+
+    if (this.leafletMap && typeof L !== 'undefined') {
+      this.leafletMap.flyTo([lat, lng], 13, { duration: 1 });
+    }
+
+    if (typeof App !== 'undefined' && App.showToast) {
+      App.showToast(`Location set to ${name}`, 'success');
+    }
   },
 
   // Clears location state for maximum privacy
@@ -795,6 +844,16 @@ const NearbyPlaces = {
     this.renderRadiusPills();
     this.updateLocationStatusUI();
     this.applyFiltersAndRender();
+
+    if (this.userLeafletMarker) {
+      this.userLeafletMarker.remove();
+      this.userLeafletMarker = null;
+    }
+    if (this.userRadiusCircle) {
+      this.userRadiusCircle.remove();
+      this.userRadiusCircle = null;
+    }
+
     if (typeof App !== 'undefined' && App.showToast) {
       App.showToast('Location cleared. Distances reset.', 'info');
     }
@@ -805,16 +864,9 @@ const NearbyPlaces = {
     const key = cityKey.toLowerCase().trim();
     if (this.knownCities[key]) {
       const city = this.knownCities[key];
-      this.currentLocation = {
-        lat: city.lat,
-        lng: city.lng,
-        name: city.name,
-        isGps: false
-      };
+      this.setUserCoordinates(city.lat, city.lng, city.name, false);
       const input = document.getElementById('inputPlacesSearch');
       if (input) input.value = city.name.split(',')[0];
-      this.updateLocationStatusUI();
-      this.applyFiltersAndRender();
     }
   },
 
@@ -822,13 +874,7 @@ const NearbyPlaces = {
     if (!query) return;
     for (const [key, city] of Object.entries(this.knownCities)) {
       if (query.includes(key) || key.includes(query)) {
-        this.currentLocation = {
-          lat: city.lat,
-          lng: city.lng,
-          name: city.name,
-          isGps: false
-        };
-        this.updateLocationStatusUI();
+        this.setUserCoordinates(city.lat, city.lng, city.name, false);
         break;
       }
     }
@@ -840,9 +886,9 @@ const NearbyPlaces = {
     if (!badge) return;
 
     if (this.currentLocation) {
-      const typeLabel = this.currentLocation.isGps ? 'GPS Device' : 'Manual Area';
+      const typeLabel = this.currentLocation.isGps ? 'GPS' : 'Map Pin / Area';
       badge.className = 'location-status-badge active';
-      badge.innerHTML = `📍 Using <strong>${this.currentLocation.name}</strong> (${typeLabel})`;
+      badge.innerHTML = `📍 Active: <strong>${this.currentLocation.name}</strong> (${typeLabel})`;
       if (btnClear) btnClear.style.display = 'inline-flex';
     } else {
       badge.className = 'location-status-badge inactive';
@@ -853,7 +899,7 @@ const NearbyPlaces = {
 
   // Haversine distance formula (in Kilometers)
   calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radius of the Earth in km
+    const R = 6371; // Radius of Earth in km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a =
@@ -862,7 +908,7 @@ const NearbyPlaces = {
       Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const d = R * c;
-    return Math.round(d * 10) / 10; // Round to 1 decimal place
+    return Math.round(d * 10) / 10;
   },
 
   // Filter places based on active criteria
@@ -1024,6 +1070,9 @@ const NearbyPlaces = {
             <a href="${p.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">
               🗺️ Open in Google Maps
             </a>
+            <button type="button" class="btn btn-sm btn-outline" onclick="NearbyPlaces.zoomToPlace(${p.lat}, ${p.lng}, '${p.id}')">
+              🎯 Show on Map
+            </button>
           </div>
         </article>
       `;
@@ -1031,36 +1080,278 @@ const NearbyPlaces = {
   },
 
   resetRadiusAndFilters() {
+    this.selectedCountry = 'all';
     this.selectedCategory = 'all';
     this.selectedRadius = 'all';
     this.searchQuery = '';
     const input = document.getElementById('inputPlacesSearch');
     if (input) input.value = '';
+    this.renderCountryPills();
     this.renderCategoryChips();
     this.renderRadiusPills();
     this.applyFiltersAndRender();
   },
 
-  // Renders the Interactive Map:
-  // If Google Maps JavaScript API is initialized, updates Google Maps markers.
-  // Otherwise, renders the Interactive Visual Map Canvas with SVG pins, survivor marker, and tooltips!
+  // Renders the Interactive Map using Leaflet.js (OpenStreetMap), Google Maps, or SVG Fallback
   renderInteractiveMap(places) {
     const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
     if (!mapCanvas) return;
 
+    // 1. Google Maps JS Mode (if configured by user/admin)
     if (this.googleMapsLoaded && window.google && window.google.maps && this.googleMapInstance) {
       this.updateGoogleMapsMarkers(places);
       return;
     }
 
-    // Built-in Offline-First Visual Interactive Map
-    // Calculates coordinate boundaries to position pins proportionally
+    // 2. Leaflet.js Mode (OpenStreetMap Interactive Engine)
+    if (typeof L !== 'undefined') {
+      this.renderLeafletMap(places);
+      return;
+    }
+
+    // 3. Fallback SVG Map (if network blocked both Leaflet and Google Maps)
+    this.renderSvgFallbackMap(places);
+  },
+
+  // Initializes Leaflet OpenStreetMap Engine
+  initLeafletMap() {
+    if (typeof L === 'undefined') return false;
+    const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
+    if (!mapCanvas) return false;
+
+    // If map already exists on element, avoid re-init error
+    if (this.leafletMap) {
+      try { this.leafletMap.remove(); } catch (e) {}
+      this.leafletMap = null;
+    }
+
+    const centerLat = this.currentLocation ? this.currentLocation.lat : 31.5204;
+    const centerLng = this.currentLocation ? this.currentLocation.lng : 74.3587;
+    const initialZoom = this.currentLocation ? 12 : 6;
+
+    try {
+      this.leafletMap = L.map('nearbyInteractiveMapCanvas', {
+        center: [centerLat, centerLng],
+        zoom: initialZoom,
+        zoomControl: true
+      });
+
+      // Free, Open-Source OpenStreetMap Tiles
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+      }).addTo(this.leafletMap);
+
+      // CLICK MAP TO DROP PIN:
+      // Empowers users to set location anywhere on the map with 1 tap,
+      // completely bypassing browser GPS blocks or denial errors!
+      this.leafletMap.on('click', (e) => {
+        this.setUserCoordinates(e.latlng.lat, e.latlng.lng, 'Pinned Point on Map', false);
+      });
+
+      // Handle resize when switching tabs
+      setTimeout(() => {
+        if (this.leafletMap) this.leafletMap.invalidateSize();
+      }, 200);
+
+      this.leafletInitialized = true;
+      return true;
+    } catch (err) {
+      console.warn('Leaflet map initialization skipped:', err);
+      return false;
+    }
+  },
+
+  // Renders markers and radius on Leaflet map
+  renderLeafletMap(places) {
+    if (!this.leafletInitialized || !this.leafletMap) {
+      if (!this.initLeafletMap()) {
+        this.renderSvgFallbackMap(places);
+        return;
+      }
+    }
+
+    // Invalidate size in case tab was hidden
+    this.leafletMap.invalidateSize();
+
+    // Clear previous place markers
+    if (this.leafletMarkers && this.leafletMarkers.length > 0) {
+      this.leafletMarkers.forEach(m => {
+        try { m.remove(); } catch (e) {}
+      });
+      this.leafletMarkers = [];
+    }
+
+    // 1. User Location Marker & Radius Circle
+    if (this.currentLocation) {
+      const userLatLng = [this.currentLocation.lat, this.currentLocation.lng];
+
+      const userPinHtml = `
+        <div class="leaflet-user-marker">
+          <div class="user-pulse-ring"></div>
+          <div class="user-center-dot">📍</div>
+        </div>
+      `;
+
+      const userIcon = L.divIcon({
+        className: 'user-pin-container',
+        html: userPinHtml,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+
+      if (!this.userLeafletMarker) {
+        this.userLeafletMarker = L.marker(userLatLng, { icon: userIcon, zIndexOffset: 1000 })
+          .addTo(this.leafletMap)
+          .bindPopup(`
+            <div style="font-size:0.85rem;line-height:1.4;">
+              <strong>📍 Your Active Location</strong><br>
+              ${this.currentLocation.name}<br>
+              <span style="font-size:0.75rem;color:#0d9488;">Click anywhere on the map to move your pin.</span>
+            </div>
+          `);
+      } else {
+        this.userLeafletMarker.setLatLng(userLatLng);
+        this.userLeafletMarker.getPopup().setContent(`
+          <div style="font-size:0.85rem;line-height:1.4;">
+            <strong>📍 Your Active Location</strong><br>
+            ${this.currentLocation.name}<br>
+            <span style="font-size:0.75rem;color:#0d9488;">Click anywhere on the map to move your pin.</span>
+          </div>
+        `);
+      }
+
+      // Radius Circle (5 km, 10 km, 25 km)
+      if (this.selectedRadius !== 'all') {
+        const radiusMeters = parseFloat(this.selectedRadius) * 1000;
+        if (!this.userRadiusCircle) {
+          this.userRadiusCircle = L.circle(userLatLng, {
+            radius: radiusMeters,
+            color: '#0d9488',
+            fillColor: '#ccfbf1',
+            fillOpacity: 0.22,
+            weight: 2,
+            dashArray: '5, 5'
+          }).addTo(this.leafletMap);
+        } else {
+          this.userRadiusCircle.setLatLng(userLatLng);
+          this.userRadiusCircle.setRadius(radiusMeters);
+        }
+      } else if (this.userRadiusCircle) {
+        this.userRadiusCircle.remove();
+        this.userRadiusCircle = null;
+      }
+    } else {
+      if (this.userLeafletMarker) {
+        this.userLeafletMarker.remove();
+        this.userLeafletMarker = null;
+      }
+      if (this.userRadiusCircle) {
+        this.userRadiusCircle.remove();
+        this.userRadiusCircle = null;
+      }
+    }
+
+    // 2. Place Markers
+    const categoryColors = {
+      hospital: '#0d9488',
+      emergency: '#dc2626',
+      shelter: '#d97706',
+      ngo: '#7c3aed',
+      survivor_support: '#e11d48',
+      counselling: '#2563eb',
+      legal_aid: '#059669'
+    };
+
+    places.forEach(p => {
+      const catObj = this.categories.find(c => c.id === p.category) || { icon: '📍', label: p.category };
+      const color = categoryColors[p.category] || '#0d9488';
+
+      const iconHtml = `
+        <div class="leaflet-marker-pin ${p.category} ${this.selectedPlaceId === p.id ? 'active' : ''}" style="border-color:${color};">
+          <span style="font-size:0.95rem;">${catObj.icon}</span>
+        </div>
+      `;
+
+      const markerIcon = L.divIcon({
+        className: 'place-marker-container',
+        html: iconHtml,
+        iconSize: [34, 34],
+        iconAnchor: [17, 17],
+        popupAnchor: [0, -18]
+      });
+
+      const distStr = p.distanceKm !== null ? ` • <strong>${p.distanceKm} km away</strong>` : '';
+
+      const popupHtml = `
+        <div class="leaflet-facility-popup">
+          <div style="font-weight:700;font-size:0.95rem;color:#0f172a;margin-bottom:3px;">${p.name}</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+            <span class="badge" style="background:${color}20;color:${color};font-weight:600;font-size:0.75rem;">${catObj.icon} ${catObj.label}</span>
+            <span class="badge" style="background:#f1f5f9;color:#475569;font-size:0.72rem;">${p.city}${distStr}</span>
+          </div>
+          <div style="font-size:0.78rem;color:#475569;margin-bottom:4px;">🏢 ${p.address}</div>
+          <div style="font-size:0.8rem;margin-bottom:6px;">📞 <strong>${p.phone}</strong></div>
+          <div style="font-size:0.75rem;background:#fff1e8;padding:6px;border-radius:4px;border-left:3px solid #c96f55;margin-bottom:8px;line-height:1.35;">
+            ${p.admissionNote}
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <a href="tel:${p.phone.replace(/[^0-9+]/g, '')}" class="btn btn-sm btn-primary" style="padding:4px 8px;font-size:0.76rem;">📞 Call</a>
+            <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" style="padding:4px 8px;font-size:0.76rem;">🧭 Directions</a>
+            <a href="${p.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline" style="padding:4px 8px;font-size:0.76rem;">🗺️ G-Maps</a>
+          </div>
+        </div>
+      `;
+
+      const marker = L.marker([p.lat, p.lng], { icon: markerIcon })
+        .addTo(this.leafletMap)
+        .bindPopup(popupHtml);
+
+      marker.on('click', () => {
+        this.highlightPlace(p.id);
+      });
+
+      this.leafletMarkers.push(marker);
+    });
+
+    // 3. Map View Fitting
+    if (this.currentLocation) {
+      if (this.selectedRadius !== 'all' && this.userRadiusCircle) {
+        this.leafletMap.fitBounds(this.userRadiusCircle.getBounds(), { padding: [25, 25], maxZoom: 14 });
+      } else {
+        this.leafletMap.setView([this.currentLocation.lat, this.currentLocation.lng], 12);
+      }
+    } else if (places.length > 0 && this.leafletMarkers.length > 0) {
+      const group = new L.featureGroup(this.leafletMarkers);
+      this.leafletMap.fitBounds(group.getBounds().pad(0.1));
+    }
+  },
+
+  zoomToPlace(lat, lng, placeId) {
+    this.highlightPlace(placeId);
+    if (this.leafletMap && typeof L !== 'undefined') {
+      this.leafletMap.flyTo([lat, lng], 15, { duration: 1.2 });
+      const target = this.leafletMarkers.find(m => {
+        const pos = m.getLatLng();
+        return Math.abs(pos.lat - lat) < 0.001 && Math.abs(pos.lng - lng) < 0.001;
+      });
+      if (target) {
+        setTimeout(() => target.openPopup(), 1200);
+      }
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  },
+
+  // Fallback SVG Visual Pinboard (used if both Leaflet and Google Maps are offline)
+  renderSvgFallbackMap(places) {
+    const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
+    if (!mapCanvas) return;
+
     const centerLat = this.currentLocation ? this.currentLocation.lat : 31.5204;
     const centerLng = this.currentLocation ? this.currentLocation.lng : 74.3587;
 
     let pinsHtml = '';
-
-    // Survivor / User Pin
     if (this.currentLocation) {
       pinsHtml += `
         <div class="map-visual-pin user-pin" style="left:50%;top:50%;" title="You are here: ${this.currentLocation.name}">
@@ -1071,15 +1362,12 @@ const NearbyPlaces = {
       `;
     }
 
-    // Place Pins (Display up to 16 nearest or filtered places)
     const displayPlaces = places.slice(0, 16);
     const bounds = this.computeCanvasBounds(displayPlaces, centerLat, centerLng);
 
-    displayPlaces.forEach((p, index) => {
-      // Calculate normalized percentage (0 to 100%) inside map canvas
+    displayPlaces.forEach(p => {
       const xPct = Math.min(92, Math.max(8, ((p.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng || 0.01)) * 84 + 8));
       const yPct = Math.min(92, Math.max(8, 100 - (((p.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat || 0.01)) * 84 + 8)));
-
       const catObj = this.categories.find(c => c.id === p.category) || { icon: '📍' };
       const isSelected = this.selectedPlaceId === p.id;
 
@@ -1103,7 +1391,7 @@ const NearbyPlaces = {
         <div class="map-compass">N</div>
         ${pinsHtml}
         <div class="map-canvas-controls">
-          <button type="button" class="btn-map-control" onclick="NearbyPlaces.centerMapOnCurrent()" title="Center on My Location">🎯 Center</button>
+          <button type="button" class="btn-map-control" onclick="NearbyPlaces.requestGeolocation()" title="Detect Location">🎯 My Location</button>
           <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((this.currentLocation ? this.currentLocation.name : 'hospitals and shelters') + ' emergency')}" target="_blank" rel="noopener noreferrer" class="btn-map-control external" title="Open full Google Maps">🌐 Google Maps</a>
         </div>
         <div class="map-notice-pill">
@@ -1128,7 +1416,6 @@ const NearbyPlaces = {
       });
     }
 
-    // Add padding margin
     const latSpan = Math.max(0.1, maxLat - minLat);
     const lngSpan = Math.max(0.1, maxLng - minLng);
 
@@ -1147,14 +1434,6 @@ const NearbyPlaces = {
       card.scrollIntoView({ behavior: 'smooth', block: 'center' });
       card.classList.add('pulse-highlight');
       setTimeout(() => card.classList.remove('pulse-highlight'), 2000);
-    }
-  },
-
-  centerMapOnCurrent() {
-    if (!this.currentLocation) {
-      this.requestGeolocation();
-    } else {
-      this.applyFiltersAndRender();
     }
   },
 
@@ -1180,7 +1459,7 @@ const NearbyPlaces = {
     script.async = true;
     script.defer = true;
     script.onerror = () => {
-      console.warn('Google Maps API failed to load (invalid key or offline). Falling back to built-in interactive map.');
+      console.warn('Google Maps API failed to load (falling back to Leaflet.js OpenStreetMap).');
       this.googleMapsLoaded = false;
     };
     document.head.appendChild(script);
@@ -1213,13 +1492,11 @@ const NearbyPlaces = {
   updateGoogleMapsMarkers(places) {
     if (!this.googleMapInstance) return;
 
-    // Clear old markers
     this.mapMarkers.forEach(m => m.setMap(null));
     this.mapMarkers = [];
 
     const bounds = new google.maps.LatLngBounds();
 
-    // User marker
     if (this.currentLocation) {
       const userPos = { lat: this.currentLocation.lat, lng: this.currentLocation.lng };
       const userMarker = new google.maps.Marker({
@@ -1239,7 +1516,6 @@ const NearbyPlaces = {
       bounds.extend(userPos);
     }
 
-    // Place markers
     places.forEach(p => {
       const pos = { lat: p.lat, lng: p.lng };
       const marker = new google.maps.Marker({
