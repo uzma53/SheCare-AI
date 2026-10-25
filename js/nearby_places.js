@@ -48,6 +48,11 @@ const NearbyPlaces = {
     { id: 'International', label: '🌐 Global' }
   ],
 
+  // Getter alias for backwards compatibility
+  get places() {
+    return this.verifiedPlaces;
+  },
+
   // Known city coordinates for manual area search & distance reference
   knownCities: {
     'lahore': { lat: 31.5204, lng: 74.3587, name: 'Lahore, Pakistan' },
@@ -1091,18 +1096,18 @@ const NearbyPlaces = {
   leafletInitialized: false,
 
   init() {
-    this.setupEventListeners();
-    this.renderCountryPills();
-    this.renderCategoryChips();
-    this.renderRadiusPills();
+    try { this.setupEventListeners(); } catch (e) { console.error('setupEventListeners error:', e); }
+    try { this.renderCountryPills(); } catch (e) { console.error('renderCountryPills error:', e); }
+    try { this.renderCategoryChips(); } catch (e) { console.error('renderCategoryChips error:', e); }
+    try { this.renderRadiusPills(); } catch (e) { console.error('renderRadiusPills error:', e); }
 
     // If map container is already visible, initialize map now
     const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
     if (mapCanvas && mapCanvas.offsetParent !== null) {
-      this.initLeafletMap();
+      try { this.initLeafletMap(); } catch (e) { console.error('initLeafletMap error:', e); }
     }
 
-    this.applyFiltersAndRender();
+    try { this.applyFiltersAndRender(); } catch (e) { console.error('applyFiltersAndRender error:', e); }
   },
 
   setupEventListeners() {
@@ -1582,7 +1587,7 @@ const NearbyPlaces = {
       });
     });
     return list;
-  }},
+  },
 
   // Update UI badge when location changes
   updateLocationStatusUI() {
@@ -1712,7 +1717,8 @@ const NearbyPlaces = {
     const container = document.getElementById('nearbyPlacesListContainer');
     if (!container) return;
 
-    if (places.length === 0) {
+    const list = (places && Array.isArray(places)) ? places : (this.getFilteredPlaces() || []);
+    if (list.length === 0) {
       container.innerHTML = `
         <div class="empty-places-card">
           <div style="font-size:2.5rem;margin-bottom:8px;">🔍</div>
@@ -1738,7 +1744,7 @@ const NearbyPlaces = {
       return;
     }
 
-    container.innerHTML = places.map(p => {
+    container.innerHTML = list.map(p => {
       const categoryObj = this.categories.find(c => c.id === p.category) || { icon: '📍', label: p.category };
       const distBadge = p.distanceKm !== null
         ? `<span class="badge badge-primary" style="font-weight:700;font-size:0.8rem;">📍 ${p.distanceKm} km away</span>`
@@ -1833,6 +1839,14 @@ const NearbyPlaces = {
 
   // Render Interactive Map via Leaflet with SVG fallback
   renderInteractiveMap(places) {
+    const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
+    if (!mapCanvas) return;
+
+    // If container is hidden (display: none), defer Leaflet initialization until section becomes visible
+    if (mapCanvas.offsetParent === null) {
+      return;
+    }
+
     if (typeof L !== 'undefined') {
       this.renderLeafletMap(places);
       return;
@@ -1848,11 +1862,23 @@ const NearbyPlaces = {
     const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
     if (!mapCanvas) return false;
 
-    // If map already exists on element, avoid re-init error
+    // If map is already initialized and valid, just invalidate size and return true
+    if (this.leafletMap && this.leafletInitialized) {
+      try {
+        this.leafletMap.invalidateSize();
+        return true;
+      } catch (e) {}
+    }
+
+    // Clean up any stale map instance or attached Leaflet id
     if (this.leafletMap) {
       try { this.leafletMap.remove(); } catch (e) {}
       this.leafletMap = null;
     }
+    if (mapCanvas._leaflet_id) {
+      try { delete mapCanvas._leaflet_id; } catch (e) { mapCanvas._leaflet_id = null; }
+    }
+    mapCanvas.innerHTML = '';
 
     const centerLat = this.currentLocation ? this.currentLocation.lat : 31.5204;
     const centerLng = this.currentLocation ? this.currentLocation.lng : 74.3587;
@@ -1892,14 +1918,15 @@ const NearbyPlaces = {
 
   // Renders markers and radius on Leaflet map
   renderLeafletMap(places) {
+    const list = (places && Array.isArray(places)) ? places : (this.getFilteredPlaces() || []);
     if (!this.leafletInitialized || !this.leafletMap) {
       if (!this.initLeafletMap()) {
-        this.renderSvgFallbackMap(places);
+        this.renderSvgFallbackMap(list);
         return;
       }
     }
 
-    this.leafletMap.invalidateSize();
+    try { this.leafletMap.invalidateSize(); } catch (e) {}
 
     // Clear previous place markers
     if (this.leafletMarkers && this.leafletMarkers.length > 0) {
@@ -2178,3 +2205,18 @@ if (typeof window !== 'undefined') {
   window.SafePlaces = NearbyPlaces;
   window.NearbyHealthcare = NearbyPlaces;
 }
+
+// Auto-initialize Nearby Places components when DOM is ready
+if (typeof document !== 'undefined') {
+  const bootNearby = () => {
+    if (typeof NearbyPlaces !== 'undefined' && NearbyPlaces.init) {
+      NearbyPlaces.init();
+    }
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootNearby);
+  } else {
+    bootNearby();
+  }
+}
+
