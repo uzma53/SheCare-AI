@@ -1,7 +1,7 @@
 <section class="view-section" id="view-nearby-places">
         <div class="section-header">
           <h1>🏥 Nearby Healthcare & Safe Places</h1>
-          <p>Interactive OpenStreetMap directory for emergency departments, hospitals, clinics, pharmacies, doctors, and women's safe shelters.</p>
+          <p>Verified directory of emergency departments, hospitals, clinics, pharmacies, doctors, and women's safe shelters.</p>
         </div>
 
         <!-- Immediate Life Danger Alert -->
@@ -27,9 +27,6 @@
             <button type="button" class="btn btn-sm btn-primary" id="btnDetectLocation">
               📍 Use My Current Location
             </button>
-            <span class="badge" style="background:#f0fdfa;color:#0d9488;border:1px solid #ccfbf1;font-weight:600;font-size:0.78rem;">
-              🗺️ Leaflet.js & OpenStreetMap (100% Free)
-            </span>
           </div>
         </div>
 
@@ -74,9 +71,6 @@
             <button type="button" class="btn btn-primary" id="btnExecutePlacesSearch">
               🔍 Search Place
             </button>
-            <button type="button" class="btn btn-secondary" id="btnSearchVisibleArea" title="Query facilities within the currently visible map area">
-              🗺️ Search This Map Area
-            </button>
             <button type="button" class="btn btn-outline" id="btnOpenGmapsExternalSearch" title="Open Google Maps search in new tab">
               🌐 Google Maps
             </button>
@@ -109,11 +103,6 @@
         <div style="margin-bottom:12px;">
           <div style="font-size:0.84rem;font-weight:600;color:var(--text);margin-bottom:8px;">Filter by Facility Category:</div>
           <div class="category-chips-container" id="nearbyCategoryChips"></div>
-        </div>
-
-        <!-- Interactive Map Canvas Wrapper -->
-        <div class="nearby-map-wrapper">
-          <div id="nearbyInteractiveMapCanvas"></div>
         </div>
 
         <!-- Results Header & Counter -->
