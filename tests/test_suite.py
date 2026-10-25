@@ -376,7 +376,7 @@ class SheCareVerificationTests(unittest.TestCase):
         sw_path = os.path.join(BASE_DIR, 'sw.js')
         sw_code = get_source_content('sw.js')
 
-        self.assertIn("shecare-v2.2", sw_code)
+        self.assertIn("shecare-v2.3", sw_code)
         # Ensure it checks mode === 'navigate' or text/html before returning index.html
         self.assertIn("e.request.mode === 'navigate'", sw_code)
         self.assertIn("accept.includes('text/html')", sw_code)
@@ -483,13 +483,12 @@ class SheCareVerificationTests(unittest.TestCase):
     # 17. Google Maps Fallback and Direct Navigation URL Generation
     # -------------------------------------------------------------
     def test_19_google_maps_fallback_and_query_generation(self):
-        """Verify that fallback interactive visual map works without API key, and directions URLs format cleanly."""
+        """Verify external Google Maps directions/search links still format cleanly (embedded map was removed)."""
         code = get_source_content(os.path.join('js', 'nearby_places.js'))
 
         self.assertIn('https://www.google.com/maps/dir/?api=1&destination=', code)
         self.assertIn('https://www.google.com/maps/search/?api=1&query=', code)
-        self.assertIn('renderInteractiveMap', code)
-        self.assertIn('map-visual-pin', code)
+        self.assertIn('openCurrentSearchInGoogleMaps', code)
 
     # -------------------------------------------------------------
     # 18. Email-Safe Package Verification (Bypassing "Blocked for security reasons")
@@ -541,28 +540,27 @@ class SheCareVerificationTests(unittest.TestCase):
     # -------------------------------------------------------------
     # 20. Leaflet.js & OpenStreetMap Interactive Engine Integration
     # -------------------------------------------------------------
-    def test_22_leaflet_osm_interactive_engine(self):
-        """Verify Leaflet.js is integrated with OpenStreetMap tiles, radius circles, and map-click location."""
+    def test_22_embedded_map_removed_location_kept(self):
+        """Verify the embedded Leaflet map is gone while location, search and the facility list remain."""
         nearby_code = get_source_content(os.path.join('js', 'nearby_places.js'))
         index_html = get_source_content('index.html')
 
-        # Check Leaflet CDN in index.html
-        self.assertIn('leaflet@1.9.4', index_html)
-        self.assertIn('leaflet.js', index_html)
-        self.assertIn('leaflet.css', index_html)
+        # The embedded map and its CDN includes must be gone
+        body_markup = index_html[index_html.find('<body>'):]
+        self.assertNotIn('leaflet@1.9.4', index_html)
+        self.assertNotIn('nearbyInteractiveMapCanvas', body_markup)
+        self.assertNotIn('nearby-map-wrapper', body_markup)
+        self.assertNotIn('L.map', nearby_code)
+        self.assertNotIn('initLeafletMap', nearby_code)
+        self.assertNotIn('btnSearchVisibleArea', index_html)
 
-        # Check Leaflet OSM tile integration in nearby_places.js
-        self.assertIn('https://tile.openstreetmap.org/{z}/{x}/{y}.png', nearby_code)
-        self.assertIn('OpenStreetMap', nearby_code)
-        self.assertIn('L.map', nearby_code)
-        self.assertIn('initLeafletMap()', nearby_code)
-
-        # Check map-click location setter (solves location enable issue)
-        self.assertIn("this.leafletMap.on('click'", nearby_code)
+        # Location, listing and agency bridge must still exist
         self.assertIn('setUserCoordinates', nearby_code)
-
-        # Check search radius circle plotting on Leaflet map
-        self.assertIn('L.circle(userLatLng', nearby_code)
+        self.assertIn('requestGeolocation', nearby_code)
+        self.assertIn('renderPlacesList', nearby_code)
+        self.assertIn('openAgencyReportForPlace', nearby_code)
+        self.assertIn('id="btnDetectLocation"', index_html)
+        self.assertIn('id="btnOpenAgencyReportModal"', index_html)
 
     # -------------------------------------------------------------
     # 21. Nominatim Geocoding & Overpass API Live Query Resilience
@@ -621,8 +619,7 @@ class SheCareVerificationTests(unittest.TestCase):
         self.assertNotIn('id="modalGoogleMapsConfig"', index_html)
         self.assertNotIn('AIzaSy', index_html)
 
-        # Configurable tile provider must exist
-        self.assertIn('tileLayerUrl', nearby_code)
+        # Overpass endpoints must remain configurable
         self.assertIn('overpassEndpoints', nearby_code)
 
         # New healthcare categories (clinic, pharmacy, doctor) must be supported
@@ -630,9 +627,9 @@ class SheCareVerificationTests(unittest.TestCase):
         self.assertIn("id: 'pharmacy'", nearby_code)
         self.assertIn("id: 'doctor'", nearby_code)
 
-        # Search visible area feature must exist
-        self.assertIn('searchCurrentMapArea', nearby_code)
-        self.assertIn('btnSearchVisibleArea', index_html)
+        # Map-only "search visible area" feature was removed together with the map
+        self.assertNotIn('searchCurrentMapArea', nearby_code)
+        self.assertNotIn('btnSearchVisibleArea', index_html)
 
     # -------------------------------------------------------------
     # 24. Police & Rescue Categories and Verified Security Centers
