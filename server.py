@@ -13,6 +13,7 @@ import os
 import hashlib
 import secrets
 import mimetypes
+import threading
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime, timezone
 
@@ -36,14 +37,24 @@ def load_json(filepath, default):
     except Exception:
         return default
 
+# Serialises read-modify-write cycles on the JSON data files now that requests are threaded.
+DATA_LOCK = threading.RLock()
+
 def save_json(filepath, data):
-    with open(filepath, 'w', encoding='utf-8') as f:
+    # Write to a temp file and swap it in, so a crash can never leave a half-written data file.
+    tmp_path = filepath + '.tmp'
+    with open(tmp_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2)
+    os.replace(tmp_path, filepath)
 
 def utc_now_iso():
     return datetime.now(timezone.utc).isoformat()
 
 class SurvivorCareHandler(http.server.SimpleHTTPRequestHandler):
+    # Drop idle/half-open connections (browsers open speculative ones) instead of
+    # letting them occupy a worker forever.
+    timeout = 30
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=BASE_DIR, **kwargs)
 
@@ -116,6 +127,10 @@ class SurvivorCareHandler(http.server.SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self):
+        with DATA_LOCK:
+            self._handle_post()
+
+    def _handle_post(self):
         parsed = urlparse(self.path)
         path = parsed.path
         body = self.read_body_json()
@@ -257,6 +272,11 @@ class SurvivorCareHandler(http.server.SimpleHTTPRequestHandler):
 
         self.send_json(404, {'error': 'Endpoint not found.'})
 
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    """Threaded server: one slow or idle connection can no longer freeze every button that calls the API."""
+    allow_reuse_address = True   # restart immediately without 'Address already in use'
+    daemon_threads = True        # worker threads never block shutdown
+
 def run_server(port=PORT):
     # Set proper MIME types
     mimetypes.init()
@@ -266,7 +286,7 @@ def run_server(port=PORT):
     mimetypes.add_type('application/manifest+json', '.webmanifest')
 
     server_address = ('', port)
-    with socketserver.TCPServer(server_address, SurvivorCareHandler) as httpd:
+    with ThreadedTCPServer(server_address, SurvivorCareHandler) as httpd:
         print(f"============================================================")
         print(f" SurvivorCare AI - Secure Offline Server running on:")
         print(f" http://localhost:{port}")
