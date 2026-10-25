@@ -207,8 +207,10 @@ const Auth = {
   triggerAutoLock() {
     if (!this.currentUser) return;
     this.isLocked = true;
-    if (window.App && typeof window.App.showLockScreen === 'function') {
-      window.App.showLockScreen();
+    // NOTE: `App` is a top-level const, so it is NOT a property of `window`
+    // (the old `window.App` check was always undefined and the lock screen never appeared).
+    if (typeof App !== 'undefined' && typeof App.showLockScreen === 'function') {
+      App.showLockScreen();
     }
   },
 
