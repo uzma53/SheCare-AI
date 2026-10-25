@@ -1,8 +1,8 @@
 /**
  * SurvivorCare AI / SheCare AI - Nearby Healthcare & Safe Places Engine
  * 
- * Powered by Leaflet.js v1.9.4 & OpenStreetMap (Zero-API-Key, 100% Free & Open-Source)
- * with Overpass API Live Healthcare, Police & Shelter Search and Nominatim Geocoding.
+ * Powered by OpenStreetMap data (Zero-API-Key, 100% Free & Open-Source) via
+ * Overpass API Live Healthcare, Police & Shelter Search and Nominatim Geocoding.
  * 
  * Categories:
  * 1. Police & Security Agencies (15 / Safe City)
@@ -1088,24 +1088,11 @@ const NearbyPlaces = {
   isGeocoding: false,
   isOverpassLoading: false,
 
-  // Leaflet State
-  leafletMap: null,
-  leafletMarkers: [],
-  userLeafletMarker: null,
-  userRadiusCircle: null,
-  leafletInitialized: false,
-
   init() {
     try { this.setupEventListeners(); } catch (e) { console.error('setupEventListeners error:', e); }
     try { this.renderCountryPills(); } catch (e) { console.error('renderCountryPills error:', e); }
     try { this.renderCategoryChips(); } catch (e) { console.error('renderCategoryChips error:', e); }
     try { this.renderRadiusPills(); } catch (e) { console.error('renderRadiusPills error:', e); }
-
-    // If map container is already visible, initialize map now
-    const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
-    if (mapCanvas && mapCanvas.offsetParent !== null) {
-      try { this.initLeafletMap(); } catch (e) { console.error('initLeafletMap error:', e); }
-    }
 
     try { this.applyFiltersAndRender(); } catch (e) { console.error('applyFiltersAndRender error:', e); }
   },
@@ -1153,14 +1140,6 @@ const NearbyPlaces = {
     if (btnGmapsDirect) {
       btnGmapsDirect.addEventListener('click', () => {
         this.openCurrentSearchInGoogleMaps();
-      });
-    }
-
-    // Search visible map area button
-    const btnSearchArea = document.getElementById('btnSearchVisibleArea');
-    if (btnSearchArea) {
-      btnSearchArea.addEventListener('click', () => {
-        this.searchCurrentMapArea();
       });
     }
   },
@@ -1240,7 +1219,7 @@ const NearbyPlaces = {
   // Geolocation with explicit survivor consent
   requestGeolocation() {
     if (!navigator.geolocation) {
-      alert('Browser geolocation is unavailable. You can click anywhere on the Leaflet map to place your pin, or choose a city shortcut.');
+      alert('Browser geolocation is unavailable. You can search by city or area name, or choose a city shortcut.');
       return;
     }
 
@@ -1289,7 +1268,7 @@ const NearbyPlaces = {
     );
   },
 
-  // Set user coordinates from GPS, Map Click, or Search
+  // Set user coordinates from GPS or Search
   setUserCoordinates(lat, lng, name = 'Selected Location', isGps = false) {
     this.currentLocation = {
       lat: Math.round(lat * 10000) / 10000,
@@ -1300,10 +1279,6 @@ const NearbyPlaces = {
 
     this.updateLocationStatusUI();
     this.applyFiltersAndRender();
-
-    if (this.leafletMap && typeof L !== 'undefined') {
-      this.leafletMap.flyTo([lat, lng], 13, { duration: 1 });
-    }
 
     if (typeof App !== 'undefined' && App.showToast) {
       App.showToast(`Location set to ${name}`, 'success');
@@ -1328,15 +1303,6 @@ const NearbyPlaces = {
     this.renderRadiusPills();
     this.updateLocationStatusUI();
     this.applyFiltersAndRender();
-
-    if (this.userLeafletMarker) {
-      this.userLeafletMarker.remove();
-      this.userLeafletMarker = null;
-    }
-    if (this.userRadiusCircle) {
-      this.userRadiusCircle.remove();
-      this.userRadiusCircle = null;
-    }
 
     if (typeof App !== 'undefined' && App.showToast) {
       App.showToast('Location cleared. Distances reset.', 'info');
@@ -1387,7 +1353,7 @@ const NearbyPlaces = {
         this.setUserCoordinates(lat, lng, displayName, false);
       } else {
         this.applyFiltersAndRender();
-        alert(`Could not pinpoint "${query}" on OpenStreetMap.\n\nTip: You can tap anywhere on the Leaflet map to place your pin!`);
+        alert(`Could not pinpoint "${query}" on OpenStreetMap.\n\nTip: try a nearby city name or one of the Quick Area buttons.`);
       }
     } catch (err) {
       this.showSearchSpinner(false);
@@ -1410,19 +1376,6 @@ const NearbyPlaces = {
     if (spinner) {
       spinner.style.display = show ? 'flex' : 'none';
       spinner.innerHTML = `<span>⏳ ${text}</span>`;
-    }
-  },
-
-  // Search currently visible map area (when user pans/zooms map)
-  searchCurrentMapArea() {
-    if (!this.leafletMap) return;
-    const center = this.leafletMap.getCenter();
-    const bounds = this.leafletMap.getBounds();
-    const radiusKm = Math.round(center.distanceTo(bounds.getNorthEast()) / 1000) || 5;
-
-    this.fetchOverpassNearbyPlaces(center.lat, center.lng, radiusKm);
-    if (typeof App !== 'undefined' && App.showToast) {
-      App.showToast(`Searching visible map area (${radiusKm} km radius)...`, 'info');
     }
   },
 
@@ -1689,7 +1642,6 @@ const NearbyPlaces = {
     const places = this.getFilteredPlaces();
     this.renderPlacesList(places);
     this.updateStatsCount(places.length);
-    this.renderInteractiveMap(places);
   },
 
   updateStatsCount(count) {
@@ -1731,9 +1683,6 @@ const NearbyPlaces = {
           <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
             <button class="btn btn-sm btn-primary" onclick="NearbyPlaces.resetRadiusAndFilters()">
               🔄 Reset Filters
-            </button>
-            <button class="btn btn-sm btn-secondary" onclick="NearbyPlaces.searchCurrentMapArea()">
-              🗺️ Search Visible Map Area
             </button>
             <button class="btn btn-sm btn-outline" onclick="NearbyPlaces.openCurrentSearchInGoogleMaps()">
               🌐 Search on Google Maps
@@ -1814,9 +1763,6 @@ const NearbyPlaces = {
           <div class="place-actions">
             ${callButton}
             ${agencyReportBtn}
-            <button type="button" class="btn btn-sm btn-secondary" onclick="NearbyPlaces.zoomToPlace('${p.id}', ${p.lat}, ${p.lng})">
-              🗺️ View on Map
-            </button>
             <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">
               🚗 Get Directions
             </a>
@@ -1835,346 +1781,6 @@ const NearbyPlaces = {
     this.renderRadiusPills();
     this.renderCategoryChips();
     this.applyFiltersAndRender();
-  },
-
-  // Render Interactive Map via Leaflet with SVG fallback
-  renderInteractiveMap(places) {
-    const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
-    if (!mapCanvas) return;
-
-    // If container is hidden (display: none), defer Leaflet initialization until section becomes visible
-    if (mapCanvas.offsetParent === null) {
-      return;
-    }
-
-    if (typeof L !== 'undefined') {
-      this.renderLeafletMap(places);
-      return;
-    }
-
-    // Fallback SVG Map (if network completely blocked Leaflet CDN)
-    this.renderSvgFallbackMap(places);
-  },
-
-  // Initializes Leaflet OpenStreetMap Engine
-  initLeafletMap() {
-    if (typeof L === 'undefined') return false;
-    const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
-    if (!mapCanvas) return false;
-
-    // If map is already initialized and valid, just invalidate size and return true
-    if (this.leafletMap && this.leafletInitialized) {
-      try {
-        this.leafletMap.invalidateSize();
-        return true;
-      } catch (e) {}
-    }
-
-    // Clean up any stale map instance or attached Leaflet id
-    if (this.leafletMap) {
-      try { this.leafletMap.remove(); } catch (e) {}
-      this.leafletMap = null;
-    }
-    if (mapCanvas._leaflet_id) {
-      try { delete mapCanvas._leaflet_id; } catch (e) { mapCanvas._leaflet_id = null; }
-    }
-    mapCanvas.innerHTML = '';
-
-    const centerLat = this.currentLocation ? this.currentLocation.lat : 31.5204;
-    const centerLng = this.currentLocation ? this.currentLocation.lng : 74.3587;
-    const initialZoom = this.currentLocation ? 12 : 7;
-
-    try {
-      this.leafletMap = L.map('nearbyInteractiveMapCanvas', {
-        center: [centerLat, centerLng],
-        zoom: initialZoom,
-        zoomControl: true
-      });
-
-      // Configurable OpenStreetMap Tiles with required attribution
-      L.tileLayer(this.config.tileLayerUrl, {
-        maxZoom: this.config.maxZoom,
-        minZoom: this.config.minZoom,
-        attribution: this.config.attribution
-      }).addTo(this.leafletMap);
-
-      // CLICK MAP TO DROP PIN:
-      this.leafletMap.on('click', (e) => {
-        this.setUserCoordinates(e.latlng.lat, e.latlng.lng, 'Pinned Point on Map', false);
-      });
-
-      // Invalidate size after layout completes
-      setTimeout(() => {
-        if (this.leafletMap) this.leafletMap.invalidateSize();
-      }, 150);
-
-      this.leafletInitialized = true;
-      return true;
-    } catch (err) {
-      console.warn('Leaflet map initialization skipped:', err);
-      return false;
-    }
-  },
-
-  // Renders markers and radius on Leaflet map
-  renderLeafletMap(places) {
-    const list = (places && Array.isArray(places)) ? places : (this.getFilteredPlaces() || []);
-    if (!this.leafletInitialized || !this.leafletMap) {
-      if (!this.initLeafletMap()) {
-        this.renderSvgFallbackMap(list);
-        return;
-      }
-    }
-
-    try { this.leafletMap.invalidateSize(); } catch (e) {}
-
-    // Clear previous place markers
-    if (this.leafletMarkers && this.leafletMarkers.length > 0) {
-      this.leafletMarkers.forEach(m => {
-        try { m.remove(); } catch (e) {}
-      });
-      this.leafletMarkers = [];
-    }
-
-    // 1. User Location Marker & Radius Circle
-    if (this.currentLocation) {
-      const userLatLng = [this.currentLocation.lat, this.currentLocation.lng];
-
-      const userPinHtml = `
-        <div class="leaflet-user-marker">
-          <div class="user-pulse-ring"></div>
-          <div class="user-center-dot">📍</div>
-        </div>
-      `;
-
-      const userIcon = L.divIcon({
-        className: 'user-pin-container',
-        html: userPinHtml,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
-      });
-
-      if (!this.userLeafletMarker) {
-        this.userLeafletMarker = L.marker(userLatLng, { icon: userIcon, zIndexOffset: 1000 })
-          .addTo(this.leafletMap)
-          .bindPopup(`
-            <div style="font-size:0.85rem;line-height:1.4;">
-              <strong>📍 Your Active Location</strong><br>
-              ${this.currentLocation.name}<br>
-              <span style="font-size:0.75rem;color:#0d9488;">Click anywhere on the map to move your pin.</span>
-            </div>
-          `);
-      } else {
-        this.userLeafletMarker.setLatLng(userLatLng);
-        this.userLeafletMarker.getPopup().setContent(`
-          <div style="font-size:0.85rem;line-height:1.4;">
-            <strong>📍 Your Active Location</strong><br>
-            ${this.currentLocation.name}<br>
-            <span style="font-size:0.75rem;color:#0d9488;">Click anywhere on the map to move your pin.</span>
-          </div>
-        `);
-      }
-
-      // Radius Circle (3 km, 5 km, 10 km, 25 km)
-      if (this.selectedRadius !== 'all') {
-        const radiusMeters = parseFloat(this.selectedRadius) * 1000;
-        if (!this.userRadiusCircle) {
-          this.userRadiusCircle = L.circle(userLatLng, {
-            radius: radiusMeters,
-            color: '#0d9488',
-            fillColor: '#ccfbf1',
-            fillOpacity: 0.22,
-            weight: 2,
-            dashArray: '5, 5'
-          }).addTo(this.leafletMap);
-        } else {
-          this.userRadiusCircle.setLatLng(userLatLng);
-          this.userRadiusCircle.setRadius(radiusMeters);
-        }
-      } else if (this.userRadiusCircle) {
-        this.userRadiusCircle.remove();
-        this.userRadiusCircle = null;
-      }
-    } else {
-      if (this.userLeafletMarker) {
-        this.userLeafletMarker.remove();
-        this.userLeafletMarker = null;
-      }
-      if (this.userRadiusCircle) {
-        this.userRadiusCircle.remove();
-        this.userRadiusCircle = null;
-      }
-    }
-
-    // 2. Place Markers
-    const categoryColors = {
-      police: '#1e3a8a',
-      emergency: '#dc2626',
-      rescue: '#ea580c',
-      hospital: '#0d9488',
-      clinic: '#0284c7',
-      pharmacy: '#16a34a',
-      doctor: '#4f46e5',
-      shelter: '#d97706',
-      ngo: '#7c3aed',
-      survivor_support: '#e11d48',
-      counselling: '#2563eb',
-      legal_aid: '#059669'
-    };
-
-    places.forEach(p => {
-      const catObj = this.categories.find(c => c.id === p.category) || { icon: '📍', label: p.category };
-      const color = categoryColors[p.category] || '#0d9488';
-
-      const iconHtml = `
-        <div class="leaflet-marker-pin ${p.category} ${this.selectedPlaceId === p.id ? 'active' : ''}" style="border-color:${color};">
-          <span style="font-size:0.95rem;">${catObj.icon}</span>
-        </div>
-      `;
-
-      const markerIcon = L.divIcon({
-        className: 'place-marker-container',
-        html: iconHtml,
-        iconSize: [34, 34],
-        iconAnchor: [17, 17],
-        popupAnchor: [0, -18]
-      });
-
-      const distStr = p.distanceKm !== null ? ` • <strong>${p.distanceKm} km away</strong>` : '';
-      const cleanName = encodeURIComponent(p.name);
-      const cleanPhone = encodeURIComponent(p.phone || '15');
-
-      const popupHtml = `
-        <div class="leaflet-facility-popup">
-          <div style="font-weight:700;font-size:0.95rem;color:#0f172a;margin-bottom:3px;">${p.name}</div>
-          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
-            <span class="badge" style="background:${color}20;color:${color};font-weight:600;font-size:0.75rem;">${catObj.icon} ${catObj.label}</span>
-            <span class="badge" style="background:#f1f5f9;color:#475569;font-size:0.72rem;">${p.city}${distStr}</span>
-          </div>
-          <div style="font-size:0.78rem;color:#475569;margin-bottom:4px;">🏢 ${p.address}</div>
-          <div style="font-size:0.8rem;margin-bottom:6px;">📞 <strong>${p.phone}</strong></div>
-          <div style="font-size:0.75rem;background:#fff1e8;padding:6px;border-radius:4px;border-left:3px solid #c96f55;margin-bottom:8px;line-height:1.35;">
-            ${p.admissionNote}
-          </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            ${p.hasRealPhone !== false && p.phone.replace(/[^0-9+]/g, '').length >= 2
-              ? `<a href="tel:${p.phone.replace(/[^0-9+]/g, '')}" class="btn btn-sm btn-primary" style="padding:4px 8px;font-size:0.76rem;">📞 Call</a>`
-              : ''}
-            <button type="button" class="btn btn-sm btn-danger" style="padding:4px 8px;font-size:0.76rem;" onclick="NearbyPlaces.openAgencyReportForPlace('${cleanName}', '${cleanPhone}')">
-              🚨 Report / Share Location
-            </button>
-            <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" style="padding:4px 8px;font-size:0.76rem;">
-              🚗 Directions
-            </a>
-          </div>
-        </div>
-      `;
-
-      try {
-        const marker = L.marker([p.lat, p.lng], { icon: markerIcon }).addTo(this.leafletMap);
-        marker.bindPopup(popupHtml);
-        marker.on('click', () => {
-          this.highlightPlace(p.id);
-        });
-        marker._placeId = p.id;
-        this.leafletMarkers.push(marker);
-      } catch (e) {
-        console.warn('Marker skipped:', e);
-      }
-    });
-  },
-
-  zoomToPlace(placeId, lat, lng) {
-    this.selectedPlaceId = placeId;
-    this.highlightPlace(placeId);
-
-    if (this.leafletMap) {
-      this.leafletMap.flyTo([lat, lng], 15, { duration: 0.8 });
-      const marker = this.leafletMarkers.find(m => m._placeId === placeId);
-      if (marker) {
-        setTimeout(() => marker.openPopup(), 900);
-      }
-    }
-  },
-
-  // Fallback SVG Map (Offline / blocked CDN fallback)
-  renderSvgFallbackMap(places) {
-    const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
-    if (!mapCanvas) return;
-
-    if (places.length === 0) {
-      mapCanvas.innerHTML = `
-        <div style="height:100%;display:flex;align-items:center;justify-content:center;background:#f8fafc;color:var(--text-muted);font-size:0.9rem;">
-          No facilities found to map for this selection.
-        </div>
-      `;
-      return;
-    }
-
-    const bounds = this.computeCanvasBounds(places);
-    const width = 800;
-    const height = 450;
-    const padding = 50;
-
-    const scaleX = (lng) => {
-      const span = bounds.maxLng - bounds.minLng || 0.1;
-      return padding + ((lng - bounds.minLng) / span) * (width - 2 * padding);
-    };
-
-    const scaleY = (lat) => {
-      const span = bounds.maxLat - bounds.minLat || 0.1;
-      return height - padding - ((lat - bounds.minLat) / span) * (height - 2 * padding);
-    };
-
-    const categoryColors = {
-      police: '#1e3a8a',
-      emergency: '#dc2626',
-      rescue: '#ea580c',
-      hospital: '#0d9488',
-      clinic: '#0284c7',
-      pharmacy: '#16a34a',
-      doctor: '#4f46e5',
-      shelter: '#d97706',
-      ngo: '#7c3aed',
-      survivor_support: '#e11d48',
-      counselling: '#2563eb',
-      legal_aid: '#059669'
-    };
-
-    let markersSvg = '';
-    places.forEach(p => {
-      const x = scaleX(p.lng);
-      const y = scaleY(p.lat);
-      const color = categoryColors[p.category] || '#0d9488';
-      const catObj = this.categories.find(c => c.id === p.category) || { icon: '📍' };
-
-      markersSvg += `
-        <g class="svg-map-marker map-visual-pin" data-place-id="${p.id}" onclick="NearbyPlaces.highlightPlace('${p.id}')" style="cursor:pointer;">
-          <circle cx="${x}" cy="${y}" r="16" fill="${color}" stroke="#ffffff" stroke-width="2.5" opacity="0.95" />
-          <text x="${x}" y="${y + 5}" text-anchor="middle" font-size="12" fill="#ffffff">${catObj.icon}</text>
-        </g>
-      `;
-    });
-
-    mapCanvas.innerHTML = `
-      <div style="position:relative;width:100%;height:100%;background:#f1f5f9;display:flex;flex-direction:column;">
-        <svg width="24" height="24" viewBox="0 0 ${width} ${height}" style="width:100%;height:100%;flex:1;">
-          <rect width="${width}" height="${height}" fill="#f8fafc" />
-          ${markersSvg}
-        </svg>
-      </div>
-    `;
-  },
-
-  computeCanvasBounds(places) {
-    let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
-    places.forEach(p => {
-      if (p.lat < minLat) minLat = p.lat;
-      if (p.lat > maxLat) maxLat = p.lat;
-      if (p.lng < minLng) minLng = p.lng;
-      if (p.lng > maxLng) maxLng = p.lng;
-    });
-    return { minLat, maxLat, minLng, maxLng };
   },
 
   highlightPlace(placeId) {
