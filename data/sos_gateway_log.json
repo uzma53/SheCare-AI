@@ -1,5 +1,21 @@
 [
   {
+    "id": "gw_dd3b94daedfc86e6",
+    "timestamp": "2026-10-25T08:00:49.570066+00:00",
+    "recipient": "+923001234567",
+    "messageLength": 37,
+    "status": "DISPATCHED_TO_CARRIER",
+    "deliveryNote": "Dispatched to SMS gateway. Carrier handshake completed. Recipient delivery depends on mobile network coverage."
+  },
+  {
+    "id": "gw_e391b9b8e1a880c4",
+    "timestamp": "2026-10-25T08:00:09.628569+00:00",
+    "recipient": "+923001234567",
+    "messageLength": 37,
+    "status": "DISPATCHED_TO_CARRIER",
+    "deliveryNote": "Dispatched to SMS gateway. Carrier handshake completed. Recipient delivery depends on mobile network coverage."
+  },
+  {
     "id": "gw_9d896edc588a9c2c",
     "timestamp": "2026-10-25T06:08:18.246032+00:00",
     "recipient": "+923001234567",
