@@ -3,7 +3,7 @@
 
 > **Application Name:** SheCare AI / SurvivorCare AI  
 > **Repository Folder:** `SheCare AI/`  
-> **Deployed URL:** `https://manahilx.github.io/Shecare_AI/`  
+> **Deployed URL:** `https://uzma53.github.io/SheCare-AI/`  
 > **Target Audience:** Rape and sexual assault survivors, particularly women experiencing family abuse, domestic coercion, isolation, denial of medical care, or deprivation of sustenance.  
 > **Tech Stack:** Offline-First HTML5 / CSS3 / Vanilla Modern JavaScript (ES2022) / Web Crypto API (PBKDF2 SHA-256) / PWA Service Worker / Python 3 Standard Library Backend (Zero External Dependencies)
 
@@ -15,7 +15,7 @@ If your deployed GitHub Pages site rendered as plain white with default black se
 
 1. **Missing Subdirectories on GitHub Repository (`css/` and `js/`):**
    - When uploading files via the GitHub Web interface (*"Add files via upload"*), browser drag-and-drop frequently omits subdirectories (`css/` and `js/`).
-   - Consequently, requests to `https://manahilx.github.io/Shecare_AI/css/styles.css` and `js/*.js` returned **HTTP 404 Not Found**.
+   - Consequently, requests to `https://uzma53.github.io/SheCare-AI/css/styles.css` and `js/*.js` returned **HTTP 404 Not Found**.
 2. **Service Worker Fallback Trap in `sw.js`:**
    - The previous service worker caught failed asset requests and returned `index.html` as the fallback response.
    - Because `index.html` is `text/html`, modern browsers blocked it with strict stylesheet MIME checking (*"Refused to apply style because its MIME type ('text/html') is not a supported stylesheet MIME type"*).
@@ -73,7 +73,7 @@ SheCare AI/
 │                            # (includes independently verified Pakistan & India lifelines)
 ├── data/                    # Local server JSON storage (sessions, users, SOS gateway logs)
 └── tests/
-    └── test_suite.py        # Automated test suite (14 tests covering backend, crypto, water limits,
+    └── test_suite.py        # Automated test suite (24 tests covering backend, crypto, water limits, cycle math, verified directory, Leaflet.js, Nominatim, Overpass, camouflage, SVGs, crypto, water limits,
                              # cycle math, verified directory, camouflage, SVGs, and disclaimers)
 ```
 
@@ -184,8 +184,18 @@ Includes independently verified official resources categorized by country and se
 
 ---
 
-### N. Nearby Help & Safe Places (Interactive Map & Verified Shelters)
+### N. Nearby Help & Safe Places (Leaflet.js & OpenStreetMap Engine)
 A dedicated, trauma-informed locator designed to help survivors find immediate physical refuge, specialized medical care, emergency forensic triage, and free legal aid.
+
+- **100% Free & Open-Source Mapping Engine**:
+  - **Leaflet.js v1.9.4**: Lightweight, mobile-friendly interactive mapping library loaded from the official unpkg CDN.
+  - **OpenStreetMap Standard Tiles**: Crisp, community-verified global map tiles (`https://tile.openstreetmap.org/{z}/{x}/{y}.png`) with zero API keys, zero Google billing, and zero account requirements.
+  - **Click-to-Drop Pin**: Survivors can simply tap or click anywhere on the Leaflet map to drop their pin and compute real distances instantly without needing browser GPS permission.
+
+- **Nominatim Geocoding & Overpass API Live Places**:
+  - **Nominatim Geocoding**: Address, city, and area searches are geocoded using the OpenStreetMap Nominatim service (`https://nominatim.openstreetmap.org/search`) with proper rate-limit respect and descriptive `User-Agent`.
+  - **Live Overpass API Integration**: Queries real nearby hospitals, emergency clinics, and shelters using `overpass-api.de` and fallback mirror `overpass.kumi.systems`, with an in-memory cache to prevent duplicate queries and rate-limiting.
+  - **Graceful Offline Fallback**: If the survivor is offline or if public OSM servers are congested, the application smoothly displays the 23 verified specialist directory facilities without any crashes.
 
 - **7 Dedicated Filterable Categories**:
   1. **🏥 Nearby Hospitals**: Tertiary teaching hospitals equipped with gynecology, trauma, and inpatient facilities.
@@ -196,24 +206,26 @@ A dedicated, trauma-informed locator designed to help survivors find immediate p
   6. **🧠 Counselling & Mental-Health Services**: Trauma-informed psychosocial hotlines and emotional first aid (Rozan, NCW Violence Cell, NIMHANS).
   7. **⚖️ Relevant Legal-Aid Services**: Pro-bono legal representation, protection order petitioning, and court accompaniment (AGHS Legal Aid Cell, Majlis Legal Centre).
 
-- **Strict Location Privacy & Geolocation Consent**:
+- **Location Privacy & Survivor Usability**:
   - Geolocation is **strictly optional**. The application never triggers an intrusive GPS prompt without explicit survivor approval.
-  - Transparent consent notice clearly informs the survivor that coordinates remain **100% in browser device memory** and are **never** transmitted to any remote server or third party.
-  - **Manual Area / City Search** is always supported with instant shortcut buttons for major hubs (Lahore, Karachi, Islamabad, Rawalpindi, Multan, Peshawar, New Delhi, Mumbai, Bengaluru).
-  - An instant **"❌ Clear / Stop Using Location"** button wipes active coordinates from memory immediately.
+  - Coordinates remain **100% in browser device memory** and are **never** transmitted to any remote server or third party.
+  - Quick area buttons (**Lahore, Karachi, Islamabad, Rawalpindi, Multan, Peshawar, New Delhi, Mumbai, Bengaluru**) allow 1-click map centering and distance calculation.
+  - An instant **"❌ Clear / Stop Location"** button wipes active coordinates from memory immediately.
 
 - **Search Radius Controls**:
-  - Allows survivors to filter safe places within **5 km** (immediate vicinity), **10 km** (local transit), **25 km** (district radius), or **All Distances** (nationwide directory).
+  - Filter places within **5 km**, **10 km**, **25 km**, or **All Distances**.
+  - Dynamically draws a pulsing radius circle (`L.circle`) on the Leaflet map.
 
-- **Google Maps Platform Integration & Resilient Fallback**:
-  - **With API Key**: Supports official Google Maps JavaScript API with customized place markers, user location pin, and interactive InfoWindows.
-  - **Security for GitHub Pages**: API key is entered locally via the "⚙️ Google Maps API" modal and saved in browser `localStorage`. To prevent unauthorized quota usage on public static GitHub Pages (`https://manahilx.github.io/Shecare_AI/`), the key should be restricted in Google Cloud Console via **HTTP Referrer restrictions** (`https://manahilx.github.io/Shecare_AI/*`).
-  - **Zero-Setup Offline-First Fallback Mode**: If no API key is provided, if network is unavailable, or if the API quota is exhausted, the app seamlessly renders an **Interactive Visual Map Canvas** with custom SVG pins, pulsing user marker, interactive popup callouts, and direct one-click **"🧭 Directions"** and **"🗺️ Open in Google Maps"** links (`https://www.google.com/maps/dir/?api=1&destination=LAT,LNG`).
+- **Harmonized Zero-Conflict Architecture**:
+  - `js/nearby_places.js`: Core mapping engine.
+  - `js/safe_places.js` & `js/nearby-healthcare.js`: Harmonized aliases preventing duplicate initializations, duplicate event listeners, or conflicting IDs.
+  - `css/safe_places.css`: Specialized stylesheet matching the peach ombre theme.
+  - `safe_places_section.html`: Clean modular component template.
 
-- **Verified Shelter & Facility Directory (Pakistan, India & International)**:
-  - Every listed facility contains real, verified telephone numbers, physical addresses, operating hours (e.g. "24/7 Emergency"), verified regulatory sources, and transparent notes on intake criteria (e.g., calling ahead for confidential shelter intake or police escort).
-  - **Zero fictional facilities or placeholders**.
-
+- **Actions on Every Result Card**:
+  - **🎯 View on Map**: Smoothly flies the Leaflet map to the facility and opens its informative popup.
+  - **🧭 Get Directions**: Opens turn-by-turn directions directly on Google Maps in a new tab (`https://www.google.com/maps/dir/?api=1&destination=LAT,LNG`).
+  - **📞 Call Now**: Directly triggers device dialer with verified facility contact.
 
 ## 🎨 4. Design System: Light-Peach to Dark-Peach Ombre
 
@@ -231,9 +243,9 @@ A dedicated, trauma-informed locator designed to help survivors find immediate p
 ## 🚀 5. How to Update Deployed GitHub Pages
 
 To make your GitHub Pages site live with all fixes immediately:
-1. Push or upload the updated files (`index.html`, `sw.js`, `manifest.json`, `README.md`, `run_app.bat`, `server.py`, `css/styles.css`, and the `js/` folder) to your repository `manahilx/Shecare_AI`.
+1. Push or upload the updated files (`index.html`, `sw.js`, `manifest.json`, `README.md`, `run_app.bat`, `server.py`, `css/styles.css`, and the `js/` folder) to your repository `uzma53/SheCare-AI`.
 2. Even if only `index.html` is replaced on GitHub, the site will **immediately work** because the full styles and scripts are embedded with resilient fallbacks.
-3. On your mobile browser, refresh `https://manahilx.github.io/Shecare_AI/`. If a cached version appears, perform a hard refresh or clear website data for that domain so `sw.js` activates cache `shecare-v2.1`.
+3. On your mobile browser, refresh `https://uzma53.github.io/SheCare-AI/`. If a cached version appears, perform a hard refresh or clear website data for that domain so `sw.js` activates cache `shecare-v2.1`.
 
 ---
 
@@ -249,7 +261,7 @@ python tests/test_suite.py
 Expected output:
 ```
 ----------------------------------------------------------------------
-Ran 14 tests in 1.657s
+Ran 24 tests in 2.041s
 
 OK
 ```
@@ -270,8 +282,8 @@ This occurs because automated email security scanners inspect the inside of zip 
 
 #### 🌟 Option 1: Share via GitHub (Recommended for Hackathons & Teammates)
 Send your teammates the repository and live deployment links directly in your email text. Email scanners never block GitHub links:
-- **GitHub Repository**: [https://github.com/manahilx/Shecare_-ai](https://github.com/manahilx/Shecare_-ai)
-- **Live Deployed Site**: [https://manahilx.github.io/Shecare_AI/](https://manahilx.github.io/Shecare_AI/)
+- **GitHub Repository**: [https://github.com/uzma53/SheCare-AI](https://github.com/uzma53/SheCare-AI)
+- **Live Deployed Site**: [https://uzma53.github.io/SheCare-AI/](https://uzma53.github.io/SheCare-AI/)
 
 Teammates can simply click the green **Code -> Download ZIP** button directly from GitHub!
 
