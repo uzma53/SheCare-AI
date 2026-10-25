@@ -1462,3 +1462,351 @@ svg {
   gap: 8px;
   margin-top: 10px;
 }
+
+
+/* SheCare AI / SurvivorCare AI - Nearby Healthcare & Safe Places Design System */
+
+/* Container & Map Canvas */
+.nearby-map-wrapper {
+  width: 100%;
+  height: 480px;
+  min-height: 420px;
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+  border: 1px solid var(--peach-border, #f1d2c2);
+  margin-bottom: 24px;
+  position: relative;
+  box-shadow: 0 4px 14px rgba(201, 111, 85, 0.12);
+  background: #f8fafc;
+}
+
+#nearbyInteractiveMapCanvas {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  position: relative;
+  z-index: 1;
+}
+
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  font-family: inherit;
+  background: #f1f5f9;
+}
+
+/* User Location Pin with Pulsing Wave */
+.leaflet-user-marker {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(13, 148, 136, 0.45);
+  animation: leaflet-pulse 2s infinite ease-out;
+}
+
+@keyframes leaflet-pulse {
+  0% { transform: translate(-50%, -50%) scale(0.6); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
+}
+
+.user-center-dot {
+  font-size: 1.4rem;
+  z-index: 10;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* Leaflet Place Markers */
+.leaflet-marker-pin {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--primary, #0d9488);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.leaflet-marker-pin:hover {
+  transform: scale(1.18);
+  z-index: 999 !important;
+}
+
+.leaflet-marker-pin.active {
+  transform: scale(1.28);
+  border-width: 3px;
+  box-shadow: 0 0 0 4px rgba(201, 111, 85, 0.35);
+}
+
+/* Facility Popup Card */
+.leaflet-facility-popup {
+  padding: 4px;
+  max-width: 290px;
+  font-family: inherit;
+  color: #1e293b;
+  line-height: 1.45;
+}
+
+/* Privacy Notice Banner */
+.location-privacy-banner {
+  background: #ffffff;
+  border: 1px solid var(--peach-border, #f1d2c2);
+  border-radius: var(--radius-lg, 16px);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: 0 1px 3px rgba(201, 111, 85, 0.08);
+}
+
+.location-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 9999px;
+}
+.location-status-badge.inactive {
+  background: #f1f5f9;
+  color: #475569;
+}
+.location-status-badge.active {
+  background: #f0fdfa;
+  color: #0d9488;
+  border: 1px solid #ccfbf1;
+}
+
+/* Search Controls Card */
+.search-controls-card {
+  background: #ffffff;
+  border: 1px solid var(--peach-border, #f1d2c2);
+  border-radius: var(--radius-lg, 16px);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(201, 111, 85, 0.08);
+}
+
+/* Country Pills */
+.country-pills-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-country-pill {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-country-pill:hover {
+  background: #fff8f5;
+  border-color: var(--peach-dark, #C96F55);
+  color: var(--peach-dark, #C96F55);
+}
+
+.btn-country-pill.active {
+  background: var(--peach-dark, #C96F55);
+  border-color: var(--peach-dark, #C96F55);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(201, 111, 85, 0.35);
+}
+
+/* Category Chips */
+.category-chips-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.btn-filter-chip {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-filter-chip:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.btn-filter-chip.active {
+  background: #0d9488;
+  border-color: #0d9488;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(13, 148, 136, 0.3);
+}
+
+/* Radius Pills */
+.radius-pills-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-radius-pill {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-radius-pill:hover {
+  background: #fff8f5;
+  color: var(--peach-dark, #C96F55);
+}
+
+.btn-radius-pill.active {
+  background: var(--peach-dark, #C96F55);
+  border-color: var(--peach-dark, #C96F55);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Quick Cities Bar */
+.quick-cities-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px dashed #e2e8f0;
+  margin-top: 8px;
+}
+
+.btn-quick-city {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-quick-city:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* Place Cards */
+.place-card {
+  background: #ffffff;
+  border: 1px solid var(--border, #ead7cc);
+  border-radius: var(--radius-lg, 16px);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(201, 111, 85, 0.08);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.place-card:hover {
+  box-shadow: 0 4px 14px rgba(201, 111, 85, 0.15);
+  border-color: var(--peach-dark, #C96F55);
+}
+
+.place-card.highlighted {
+  border-color: var(--peach-dark, #C96F55);
+  box-shadow: 0 0 0 3px rgba(201, 111, 85, 0.25);
+  background: #fffbf9;
+}
+
+.place-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.place-meta-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.place-admission-box {
+  background: #fff8f5;
+  border: 1px solid var(--peach-soft, #f6c7ae);
+  border-left: 3px solid var(--peach-dark, #C96F55);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 10px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.place-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border, #ead7cc);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .nearby-map-wrapper {
+    height: 380px;
+    min-height: 320px;
+  }
+  #nearbyInteractiveMapCanvas {
+    min-height: 320px;
+  }
+  .search-controls-card {
+    padding: 14px;
+  }
+  .place-card {
+    padding: 16px;
+  }
+}
