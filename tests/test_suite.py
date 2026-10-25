@@ -609,5 +609,30 @@ class SheCareVerificationTests(unittest.TestCase):
         dups = [k for k, v in counts.items() if v > 1]
         self.assertEqual(len(dups), 0, f"Duplicate HTML IDs found: {dups}")
 
+    # -------------------------------------------------------------
+    # 23. Leaflet Cleanliness, Configurable Provider & Zero Google Modal
+    # -------------------------------------------------------------
+    def test_25_leaflet_cleanliness_and_no_google_modal(self):
+        """Verify rogue Google Maps modal is gone, provider is configurable, and new healthcare categories exist."""
+        index_html = get_source_content('index.html')
+        nearby_code = get_source_content(os.path.join('js', 'nearby_places.js'))
+
+        # Rogue modal must be completely removed
+        self.assertNotIn('id="modalGoogleMapsConfig"', index_html)
+        self.assertNotIn('AIzaSy', index_html)
+
+        # Configurable tile provider must exist
+        self.assertIn('tileLayerUrl', nearby_code)
+        self.assertIn('overpassEndpoints', nearby_code)
+
+        # New healthcare categories (clinic, pharmacy, doctor) must be supported
+        self.assertIn("id: 'clinic'", nearby_code)
+        self.assertIn("id: 'pharmacy'", nearby_code)
+        self.assertIn("id: 'doctor'", nearby_code)
+
+        # Search visible area feature must exist
+        self.assertIn('searchCurrentMapArea', nearby_code)
+        self.assertIn('btnSearchVisibleArea', index_html)
+
 if __name__ == '__main__':
     unittest.main()
