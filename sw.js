@@ -56,12 +56,18 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  const url = e.request.url;
+  const req = e.request;
 
-  // 1. Pass API requests through or provide clean offline JSON response
-  if (url.includes('/api/')) {
+  // Only handle same-origin GET requests. Third-party services (maps, geocoding, Overpass)
+  // and POSTs must reach the network untouched - never answer them from here.
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  // 1. Local backend API: pass through, or give a clean offline JSON response
+  if (url.pathname.startsWith('/api/')) {
     e.respondWith(
-      fetch(e.request).catch(() => {
+      fetch(req).catch(() => {
         return new Response(JSON.stringify({
           error: 'Offline / Static Hosting Mode: Backend server is not running on this domain.',
           offline: true
@@ -74,29 +80,25 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // 2. Cache-first strategy for UI assets
+  // 2. Network-first for app files, so an update is always picked up when online
+  //    (cache-first kept serving stale HTML/JS that no longer matched each other).
+  //    The cache is the offline fallback.
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      return fetch(e.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200) {
-          return networkResponse;
-        }
-
-        // Cache valid response clone
+    fetch(req).then((networkResponse) => {
+      if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
         const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(e.request, responseToCache);
-        });
-        return networkResponse;
-      }).catch(() => {
-        // ONLY fallback to index.html for page navigation, NEVER for CSS or JS!
+        caches.open(CACHE_NAME).then((cache) => cache.put(req, responseToCache)).catch(() => {});
+      }
+      return networkResponse;
+    }).catch(() => {
+      return caches.match(req, { ignoreSearch: true }).then((cachedResponse) => {
+        if (cachedResponse) return cachedResponse;
+        // ONLY fall back to index.html for page navigation, NEVER for CSS or JS!
         const accept = e.request.headers.get('accept') || '';
         if (e.request.mode === 'navigate' || accept.includes('text/html')) {
-          return caches.match('./index.html') || caches.match('./');
+          return caches.match('./index.html')
+            .then((page) => page || caches.match('./'))
+            .then((page) => page || new Response('Offline', { status: 503, statusText: 'Offline' }));
         }
         // Return 404 response instead of breaking MIME types
         return new Response('Asset unavailable offline', { status: 404, statusText: 'Not Found' });
