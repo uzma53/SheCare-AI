@@ -7,6 +7,7 @@
   <meta name="description" content="SheCare AI / SurvivorCare AI - Secure, offline-first care and support application for survivors of sexual violence.">
   <title>SheCare AI - Secure Offline Support</title>
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/safe_places.css">
   <style id="shecare-core-styles">
 /* SheCare AI / SurvivorCare AI - Modern Healthcare Design System & Mobile Responsive Engine */
 :root {
@@ -1986,9 +1987,9 @@ svg {
             <button type="button" class="btn btn-sm btn-primary" id="btnDetectLocation">
               📍 Use My Current Location
             </button>
-            <button type="button" class="btn btn-sm btn-secondary" id="btnConfigGoogleMaps" title="Configure optional Google Maps JavaScript API key">
-              ⚙️ Google Maps API
-            </button>
+            <span class="badge" style="background:#f0fdfa;color:#0d9488;border:1px solid #ccfbf1;font-weight:600;font-size:0.78rem;">
+              🗺️ Leaflet.js & OpenStreetMap (100% Free)
+            </span>
           </div>
         </div>
 
@@ -2001,7 +2002,7 @@ svg {
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
             <div style="flex:1;min-width:240px;position:relative;">
-              <input type="text" class="form-control" id="inputPlacesSearch" placeholder="Enter city, district, or hospital name (e.g., Lahore, Karachi, Delhi, Mumbai)...">
+              <input type="text" class="form-control" id="inputPlacesSearch" placeholder="Enter area, city, or address (e.g., Gulberg Lahore, Clifton Karachi, South Delhi, Bandra Mumbai)...">
             </div>
             <button type="button" class="btn btn-primary" id="btnExecutePlacesSearch">
               🔍 Search Places
@@ -3770,6 +3771,31 @@ const SOS = {
  *   4. Typing any city or district into the search bar.
  */
 
+/**
+ * SurvivorCare AI / SheCare AI - Nearby Help & Safe Places Engine
+ * 
+ * Powered by Leaflet.js v1.9.4 & OpenStreetMap (Zero-API-Key, 100% Free & Open-Source)
+ * with Nominatim Geocoding & Live Overpass API Search.
+ * 
+ * Categories:
+ * 1. Nearby Hospitals
+ * 2. Emergency Departments
+ * 3. Women's Shelters & Safe Accommodation
+ * 4. Women's Support Centres and NGOs
+ * 5. Sexual-Assault Survivor Support Services
+ * 6. Counselling and Mental-Health Services
+ * 7. Relevant Legal-Aid Services
+ * 
+ * Location Privacy & Usability:
+ * - Geolocation is 100% strictly optional.
+ * - Coordinates remain strictly inside browser memory.
+ * - Survivors can easily set their location by:
+ *   1. Clicking "📍 Use My Current Location" (Browser GPS on explicit request)
+ *   2. Clicking ANYWHERE on the Leaflet map to drop their pin!
+ *   3. Clicking quick city shortcuts (Lahore, Karachi, Islamabad, Delhi, Mumbai, etc.)
+ *   4. Typing any city, district, or address into the search bar (Nominatim geocoding).
+ */
+
 const NearbyPlaces = {
   // Supported Countries & Regions
   countries: [
@@ -3806,7 +3832,7 @@ const NearbyPlaces = {
     { id: 'all', label: 'All Safe Places', icon: '📍' },
     { id: 'hospital', label: 'Hospitals', icon: '🏥' },
     { id: 'emergency', label: 'Emergency Departments', icon: '🚨' },
-    { id: 'shelter', label: 'Women's Shelters', icon: '🏡' },
+    { id: 'shelter', label: "Women's Shelters", icon: '🏡' },
     { id: 'ngo', label: 'Support Centres & NGOs', icon: '🤝' },
     { id: 'survivor_support', label: 'Survivor Support', icon: '🛡️' },
     { id: 'counselling', label: 'Counselling & Mental Health', icon: '🧠' },
@@ -3833,7 +3859,8 @@ const NearbyPlaces = {
       serviceType: 'Confidential Safe Shelter & Psychosocial Rehabilitation',
       capacityNotice: 'Capacity varies daily. No guarantee of immediate bed space; phone intake required before arrival.',
       admissionNote: 'Strictly confidential admission for female survivors of domestic and sexual violence. Call ahead or arrive with authorized referral/police assistance.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Panah+Shelter+Home+Karachi'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Panah+Shelter+Home+Karachi',
+      sourceType: 'verified'
     },
     {
       id: 'pk-dastak-lahore',
@@ -3852,7 +3879,8 @@ const NearbyPlaces = {
       serviceType: 'Crisis Refuge, Legal Litigation & Survivor Accompaniment',
       capacityNotice: 'Strict security intake. Admission requires advance telephone screening.',
       admissionNote: 'Safe shelter providing emergency housing, free legal aid, and trauma counseling. Prior intake phone call strongly recommended for secure admission.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Dastak+Charitable+Trust+Lahore'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Dastak+Charitable+Trust+Lahore',
+      sourceType: 'verified'
     },
     {
       id: 'pk-edhi-shelter-karachi',
@@ -3871,7 +3899,8 @@ const NearbyPlaces = {
       serviceType: 'Unconditional Emergency Refuge & 24/7 Ambulance Fleet (115)',
       capacityNotice: '24/7 open casualty intake. Ambulance transport available nationwide.',
       admissionNote: 'Unconditional safe haven for distressed, abused, or abandoned women and children. 24/7 national ambulance service available via 115.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Edhi+Home+Mithadar+Karachi'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Edhi+Home+Mithadar+Karachi',
+      sourceType: 'verified'
     },
     {
       id: 'pk-bb-crisis-islamabad',
@@ -3890,7 +3919,8 @@ const NearbyPlaces = {
       serviceType: 'Government One-Window Crisis & Inter-Agency Coordination',
       capacityNotice: 'Short-term crisis protection (up to 72h) with medical/police linkage.',
       admissionNote: 'Federal one-window crisis facility integrating temporary accommodation, medical examination, psychological first aid, and direct legal referral.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Shaheed+Benazir+Bhutto+Crisis+Centre+Islamabad'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Shaheed+Benazir+Bhutto+Crisis+Centre+Islamabad',
+      sourceType: 'verified'
     },
     {
       id: 'pk-jpmc-karachi',
@@ -3909,7 +3939,8 @@ const NearbyPlaces = {
       serviceType: 'Tertiary Public Hospital, 24/7 Medico-Legal Care & HIV PEP',
       capacityNotice: '24/7 Emergency Department open for acute assault triage & forensics.',
       admissionNote: 'Public tertiary hospital with 24/7 female Medico-Legal Officers (MLO), emergency post-assault forensic documentation, emergency contraception, and HIV PEP.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Jinnah+Postgraduate+Medical+Centre+Karachi'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Jinnah+Postgraduate+Medical+Centre+Karachi',
+      sourceType: 'verified'
     },
     {
       id: 'pk-services-lahore',
@@ -3928,7 +3959,8 @@ const NearbyPlaces = {
       serviceType: 'Apex Public Emergency, Gynecology Trauma & MLO Cell',
       capacityNotice: '24/7 Open casualty. Post-assault trauma documentation available.',
       admissionNote: 'Full 24/7 emergency triage, certified rape trauma examination unit, emergency obstetrics/gynecology, and injury stabilization.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Services+Hospital+Emergency+Lahore'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Services+Hospital+Emergency+Lahore',
+      sourceType: 'verified'
     },
     {
       id: 'pk-pims-islamabad',
@@ -3947,7 +3979,8 @@ const NearbyPlaces = {
       serviceType: 'Federal Apex Hospital, Rape Forensic Kits & Surgical Triage',
       capacityNotice: '24/7 Emergency casualty care open for acute injuries.',
       admissionNote: 'Federal apex emergency hospital. 24/7 Medico-Legal Officer on duty, forensic rape examination kit, post-exposure prophylaxis (PEP), and acute surgical care.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=PIMS+Hospital+Emergency+Islamabad'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=PIMS+Hospital+Emergency+Islamabad',
+      sourceType: 'verified'
     },
     {
       id: 'pk-mayo-lahore',
@@ -3966,7 +3999,8 @@ const NearbyPlaces = {
       serviceType: 'Public Inpatient Teaching Hospital & Surgical Casualty',
       capacityNotice: '24/7 Emergency department admission.',
       admissionNote: 'Largest public teaching hospital in Punjab. Complete surgical, gynecological, psychiatric, and trauma departments.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Mayo+Hospital+Lahore'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Mayo+Hospital+Lahore',
+      sourceType: 'verified'
     },
     {
       id: 'pk-civil-karachi',
@@ -3985,7 +4019,8 @@ const NearbyPlaces = {
       serviceType: 'Public Emergency, Medico-Legal Examination & Prophylaxis',
       capacityNotice: '24/7 Acute casualty intake.',
       admissionNote: 'Major public emergency and specialized gynecology hospital with round-the-clock medicolegal staff and HIV prophylaxis resources.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Civil+Hospital+Karachi'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Civil+Hospital+Karachi',
+      sourceType: 'verified'
     },
     {
       id: 'pk-rozan-islamabad',
@@ -4004,7 +4039,8 @@ const NearbyPlaces = {
       serviceType: 'Specialized Trauma Counseling & Sexual Violence Psychosocial Support',
       capacityNotice: 'Daytime telephonic & in-person counselling; callback queue active.',
       admissionNote: 'Trauma-informed survivor counselling, specialized emotional support for survivors of sexual assault and domestic violence, and safe referral coordination.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Rozan+Islamabad'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Rozan+Islamabad',
+      sourceType: 'verified'
     },
     {
       id: 'pk-madadgaar-karachi',
@@ -4023,7 +4059,8 @@ const NearbyPlaces = {
       serviceType: 'Nationwide 24/7 Crisis Hotline & Rapid Shelter Referral',
       capacityNotice: 'Immediate helpline dispatch and shelter referral coordination.',
       admissionNote: 'Nationwide crisis intervention, emergency legal support, safe shelter transport linkages, and rapid child/women rescue operations.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Madadgaar+Helpline+Karachi'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Madadgaar+Helpline+Karachi',
+      sourceType: 'verified'
     },
     {
       id: 'pk-aghs-lahore',
@@ -4042,7 +4079,8 @@ const NearbyPlaces = {
       serviceType: 'Pro-Bono Legal Litigation, Protection Orders & Court Representation',
       capacityNotice: 'Office appointments during legal business hours; emergency court filings supported.',
       admissionNote: 'Free pro-bono litigation, police reporting assistance, court protection orders, and legal representation for survivors of rape and domestic brutality.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=AGHS+Legal+Aid+Cell+Lahore'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=AGHS+Legal+Aid+Cell+Lahore',
+      sourceType: 'verified'
     },
     {
       id: 'pk-aasra-multan',
@@ -4061,7 +4099,8 @@ const NearbyPlaces = {
       serviceType: 'Safe Crisis Shelter, First Aid & Legal Linkages',
       capacityNotice: 'Government Dar-ul-Aman facility; intake subject to security verification.',
       admissionNote: 'Government Dar-ul-Aman shelter offering safe shelter, medical first aid, and legal assistance for vulnerable women.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Dar-ul-Aman+Multan'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Dar-ul-Aman+Multan',
+      sourceType: 'verified'
     },
     {
       id: 'pk-lrh-peshawar',
@@ -4080,7 +4119,8 @@ const NearbyPlaces = {
       serviceType: 'Apex Trauma Emergency & 24/7 MLO Casualty Services',
       capacityNotice: '24/7 Open casualty & trauma surgery.',
       admissionNote: 'Primary public tertiary emergency center in KPK. 24/7 Medico-Legal casualty services, emergency gynecology, and surgical trauma care.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Lady+Reading+Hospital+Peshawar'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Lady+Reading+Hospital+Peshawar',
+      sourceType: 'verified'
     },
 
     // --- INDIA ---
@@ -4101,11 +4141,12 @@ const NearbyPlaces = {
       serviceType: 'Integrated One Stop Crisis Centre, Medical Aid & Safe Stay',
       capacityNotice: 'Temporary safe stay up to 5 days; long-term shelter transfer coordination.',
       admissionNote: 'Official One Stop Centre providing medical aid, police facilitation, psycho-social counselling, legal aid, and temporary safe accommodation (up to 5 days).',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sakhi+One+Stop+Centre+Delhi'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Sakhi+One+Stop+Centre+Delhi',
+      sourceType: 'verified'
     },
     {
       id: 'in-jagori-delhi',
-      name: 'Jagori Women's Crisis & Safety Center',
+      name: "Jagori Women's Crisis & Safety Center",
       category: 'survivor_support',
       country: 'India',
       city: 'New Delhi',
@@ -4120,7 +4161,8 @@ const NearbyPlaces = {
       serviceType: 'Crisis Intervention, Safety Planning & Institutional Referrals',
       capacityNotice: 'Helpline active Monday-Friday; emergency shelter referrals.',
       admissionNote: 'Survivor counseling, crisis intervention, safety planning, and referral to partner shelters and public hospitals across the Delhi NCR region.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Jagori+Malviya+Nagar+Delhi'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Jagori+Malviya+Nagar+Delhi',
+      sourceType: 'verified'
     },
     {
       id: 'in-sneha-mumbai',
@@ -4139,11 +4181,12 @@ const NearbyPlaces = {
       serviceType: 'Gender Violence Response, Hospital Accompaniment & Crisis Care',
       capacityNotice: '24/7 Crisis helpline response with municipal hospital coordination.',
       admissionNote: 'Trauma counseling, hospital emergency accompaniment, safe shelter referral, and legal guidance for survivors of sexual and domestic violence.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=SNEHA+Sion+Mumbai'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=SNEHA+Sion+Mumbai',
+      sourceType: 'verified'
     },
     {
       id: 'in-vimochana-bengaluru',
-      name: 'Vimochana Forum for Women's Rights & Crisis Shelter',
+      name: "Vimochana Forum for Women's Rights & Crisis Shelter",
       category: 'shelter',
       country: 'India',
       city: 'Bengaluru',
@@ -4153,12 +4196,13 @@ const NearbyPlaces = {
       phone: '+91 80 2549 2781',
       altPhone: '+91 80 2549 4230',
       hours: '24/7 Emergency Crisis Intake',
-      verifiedSource: 'Vimochana Autonomous Women's Collective (Active since 1979)',
+      verifiedSource: "Vimochana Autonomous Women's Collective (Active since 1979)",
       lastVerified: 'October 2026',
       serviceType: 'Safe Refuge (Angala), Legal Counseling & Crisis Defense',
       capacityNotice: 'Confidential shelter intake subject to space and safety assessment.',
       admissionNote: 'Safe shelter (Angala crisis refuge), emergency crisis intervention, legal aid counseling, and emotional rehabilitation for women facing violence.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Vimochana+Bengaluru'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Vimochana+Bengaluru',
+      sourceType: 'verified'
     },
     {
       id: 'in-aiims-delhi',
@@ -4177,7 +4221,8 @@ const NearbyPlaces = {
       serviceType: 'National Apex Emergency, Forensic Examination & Contraception/PEP',
       capacityNotice: '24/7 Open Apex trauma emergency.',
       admissionNote: 'National apex hospital. 24/7 emergency medical treatment, clinical forensic examination, STI/HIV prophylaxis, and emergency contraception.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=AIIMS+Emergency+New+Delhi'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=AIIMS+Emergency+New+Delhi',
+      sourceType: 'verified'
     },
     {
       id: 'in-kem-mumbai',
@@ -4196,11 +4241,12 @@ const NearbyPlaces = {
       serviceType: 'Public Trauma Emergency & Medico-Legal Examination Unit',
       capacityNotice: '24/7 Open casualty.',
       admissionNote: '24/7 comprehensive trauma emergency, forensic medical examination, post-assault prophylaxis, and dedicated social worker crisis unit.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=KEM+Hospital+Parel+Mumbai'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=KEM+Hospital+Parel+Mumbai',
+      sourceType: 'verified'
     },
     {
       id: 'in-stjohns-bengaluru',
-      name: 'St. John's Medical College Hospital Emergency',
+      name: "St. John's Medical College Hospital Emergency",
       category: 'hospital',
       country: 'India',
       city: 'Bengaluru',
@@ -4210,12 +4256,13 @@ const NearbyPlaces = {
       phone: '+91 80 2206 5000',
       altPhone: '+91 80 2206 5169',
       hours: '24/7 Emergency & Acute Trauma Care',
-      verifiedSource: 'St. John's National Academy of Health Sciences',
+      verifiedSource: "St. John's National Academy of Health Sciences",
       lastVerified: 'October 2026',
       serviceType: 'Confidential Assault Treatment & Emergency Gynecology',
       capacityNotice: '24/7 Emergency trauma department open.',
-      admissionNote: '24/7 emergency medical care, confidential assault documentation, counseling, and direct referral to local women's support centers.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=St+Johns+Hospital+Koramangala+Bengaluru'
+      admissionNote: "24/7 emergency medical care, confidential assault documentation, counseling, and direct referral to local women's support centers.",
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=St+Johns+Hospital+Koramangala+Bengaluru',
+      sourceType: 'verified'
     },
     {
       id: 'in-majlis-mumbai',
@@ -4234,7 +4281,8 @@ const NearbyPlaces = {
       serviceType: 'Pioneering Feminist Legal Aid, Criminal Defense & Court Support',
       capacityNotice: 'Free legal counseling and protection order petitioning.',
       admissionNote: 'Specialized team of women lawyers providing free litigation support, police station intervention, protection orders, and courtroom representation.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Majlis+Legal+Centre+Mumbai'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Majlis+Legal+Centre+Mumbai',
+      sourceType: 'verified'
     },
     {
       id: 'in-ncw-delhi',
@@ -4253,7 +4301,8 @@ const NearbyPlaces = {
       serviceType: '24/7 National Commission for Women Emergency Cell (7827170170)',
       capacityNotice: 'Nationwide administrative escalation to district superintendents of police.',
       admissionNote: 'Direct coordination with district police, One Stop Centres, and shelter homes nationwide for immediate survivor intervention.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=National+Commission+for+Women+New+Delhi'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=National+Commission+for+Women+New+Delhi',
+      sourceType: 'verified'
     },
 
     // --- INTERNATIONAL LIFELINES ---
@@ -4274,7 +4323,8 @@ const NearbyPlaces = {
       serviceType: 'Confidential 24/7 Sexual Assault Hotline & Global Web Chat',
       capacityNotice: '24/7 Free confidential crisis intervention.',
       admissionNote: 'Confidential 24/7 trauma-informed crisis intervention, referrals to local SARCs (Sexual Assault Resource Centers) and medical clinics worldwide.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=RAINN+Washington+DC'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=RAINN+Washington+DC',
+      sourceType: 'verified'
     },
     {
       id: 'intl-refuge-uk',
@@ -4284,7 +4334,7 @@ const NearbyPlaces = {
       city: 'London',
       lat: 51.5074,
       lng: -0.1278,
-      address: '4th Floor, International House, 1 St Katharine's Way, London, UK',
+      address: "4th Floor, International House, 1 St Katharine's Way, London, UK",
       phone: '0808 2000 247',
       altPhone: '+44 20 7395 7700',
       hours: '24/7 Freephone & Emergency Refuge Placement',
@@ -4293,7 +4343,8 @@ const NearbyPlaces = {
       serviceType: 'National Safe Houses Network & 24/7 Domestic Abuse Helpline',
       capacityNotice: 'Emergency refuge placement across the United Kingdom.',
       admissionNote: 'Provides access to safe houses and refuges across the UK for women and children escaping domestic abuse and sexual violence.',
-      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Refuge+London+UK'
+      googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=Refuge+London+UK',
+      sourceType: 'verified'
     }
   ],
 
@@ -4304,10 +4355,10 @@ const NearbyPlaces = {
   selectedRadius: 'all',      // 'all' | 5 | 10 | 25
   searchQuery: '',            // free text filter
   selectedPlaceId: null,      // highlighted marker
-  gmapsApiKey: '',
-  googleMapsLoaded: false,
-  googleMapInstance: null,
-  mapMarkers: [],
+  liveOsmPlaces: [],          // dynamically fetched from Overpass API
+  overpassCache: {},          // in-memory query cache to avoid hitting rate limits
+  isGeocoding: false,
+  isOverpassLoading: false,
 
   // Leaflet State
   leafletMap: null,
@@ -4317,28 +4368,16 @@ const NearbyPlaces = {
   leafletInitialized: false,
 
   init() {
-    // 1. Load stored Google Maps API Key if any
-    try {
-      this.gmapsApiKey = localStorage.getItem('shecare_gmaps_api_key') || '';
-    } catch (e) {
-      this.gmapsApiKey = '';
-    }
-
-    // 2. Setup DOM event listeners
+    // 1. Setup DOM event listeners
     this.setupEventListeners();
 
-    // 3. Render country, category & radius pills
+    // 2. Render country, category & radius pills
     this.renderCountryPills();
     this.renderCategoryChips();
     this.renderRadiusPills();
 
-    // 4. Initial render of list & map
+    // 3. Initial render of list & map
     this.applyFiltersAndRender();
-
-    // 5. If Google Maps API key exists, attempt loading Google Maps SDK
-    if (this.gmapsApiKey && !this.googleMapsLoaded) {
-      this.loadGoogleMapsScript(this.gmapsApiKey);
-    }
   },
 
   setupEventListeners() {
@@ -4354,22 +4393,18 @@ const NearbyPlaces = {
       btnClearLoc.addEventListener('click', () => this.clearLocation());
     }
 
-    // Search Input and Button
+    // Search Input and Button (Nominatim Geocoding)
     const inputSearch = document.getElementById('inputPlacesSearch');
     const btnSearch = document.getElementById('btnExecutePlacesSearch');
     if (btnSearch && inputSearch) {
       btnSearch.addEventListener('click', () => {
-        this.searchQuery = inputSearch.value.trim().toLowerCase();
-        this.checkCityDirectMatch(this.searchQuery);
-        this.applyFiltersAndRender();
+        this.executeManualSearch(inputSearch.value.trim());
       });
 
       inputSearch.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
-          this.searchQuery = inputSearch.value.trim().toLowerCase();
-          this.checkCityDirectMatch(this.searchQuery);
-          this.applyFiltersAndRender();
+          this.executeManualSearch(inputSearch.value.trim());
         }
       });
     }
@@ -4383,51 +4418,7 @@ const NearbyPlaces = {
       });
     });
 
-    // Google Maps API Key Modal Triggers
-    const btnConfigMaps = document.getElementById('btnConfigGoogleMaps');
-    const modalMaps = document.getElementById('modalGoogleMapsConfig');
-    const formMaps = document.getElementById('formGoogleMapsConfig');
-    const btnRemoveKey = document.getElementById('btnRemoveGoogleMapsKey');
-
-    if (btnConfigMaps) {
-      btnConfigMaps.addEventListener('click', () => {
-        const inputKey = document.getElementById('inputGoogleMapsApiKey');
-        if (inputKey) inputKey.value = this.gmapsApiKey;
-        if (typeof App !== 'undefined' && App.openModal) {
-          App.openModal('modalGoogleMapsConfig');
-        } else if (modalMaps) {
-          modalMaps.classList.add('active');
-        }
-      });
-    }
-
-    if (formMaps) {
-      formMaps.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const key = document.getElementById('inputGoogleMapsApiKey').value.trim();
-        this.saveApiKey(key);
-        if (typeof App !== 'undefined' && App.closeModal) {
-          App.closeModal('modalGoogleMapsConfig');
-          App.showToast('Google Maps key saved locally.', 'success');
-        } else if (modalMaps) {
-          modalMaps.classList.remove('active');
-        }
-      });
-    }
-
-    if (btnRemoveKey) {
-      btnRemoveKey.addEventListener('click', () => {
-        this.clearApiKey();
-        if (typeof App !== 'undefined' && App.closeModal) {
-          App.closeModal('modalGoogleMapsConfig');
-          App.showToast('Google Maps key removed.', 'info');
-        } else if (modalMaps) {
-          modalMaps.classList.remove('active');
-        }
-      });
-    }
-
-    // Google Maps Search Direct Button
+    // Google Maps Search Direct Button (external tab)
     const btnGmapsDirect = document.getElementById('btnOpenGmapsExternalSearch');
     if (btnGmapsDirect) {
       btnGmapsDirect.addEventListener('click', () => {
@@ -4501,6 +4492,10 @@ const NearbyPlaces = {
         this.selectedRadius = val === 'all' ? 'all' : parseInt(val, 10);
         this.renderRadiusPills();
         this.applyFiltersAndRender();
+
+        if (this.currentLocation) {
+          this.fetchOverpassNearbyPlaces(this.currentLocation.lat, this.currentLocation.lng, this.selectedRadius);
+        }
       });
     });
   },
@@ -4553,9 +4548,13 @@ const NearbyPlaces = {
         }
         
         alert(
-          msg + '\n\n' +
-          '💡 EASY ALTERNATIVE:\n' +
-          '1. Simply CLICK anywhere on the interactive map to place your pin!\n' +
+          msg + '
+
+' +
+          '💡 EASY ALTERNATIVE:
+' +
+          '1. Simply CLICK anywhere on the interactive map to place your pin!
+' +
           '2. Or click any quick city button below (Lahore, Karachi, Delhi, etc.).'
         );
       },
@@ -4582,12 +4581,16 @@ const NearbyPlaces = {
     if (typeof App !== 'undefined' && App.showToast) {
       App.showToast(`Location set to ${name}`, 'success');
     }
+
+    // Automatically search live OpenStreetMap hospitals & shelters around this location
+    this.fetchOverpassNearbyPlaces(lat, lng, this.selectedRadius);
   },
 
   // Clears location state for maximum privacy
   clearLocation() {
     this.currentLocation = null;
     this.selectedRadius = 'all';
+    this.liveOsmPlaces = [];
     this.renderRadiusPills();
     this.updateLocationStatusUI();
     this.applyFiltersAndRender();
@@ -4617,14 +4620,176 @@ const NearbyPlaces = {
     }
   },
 
-  checkCityDirectMatch(query) {
+  // Manual search execution: Checks local shortcuts first, then queries Nominatim Geocoder
+  async executeManualSearch(query) {
     if (!query) return;
+    this.searchQuery = query.toLowerCase().trim();
+
+    // 1. Check instant local city match
     for (const [key, city] of Object.entries(this.knownCities)) {
-      if (query.includes(key) || key.includes(query)) {
+      if (this.searchQuery === key || this.searchQuery.includes(key)) {
         this.setUserCoordinates(city.lat, city.lng, city.name, false);
-        break;
+        return;
       }
     }
+
+    // 2. Query Nominatim OpenStreetMap Geocoder (Respecting rate limit with descriptive User-Agent)
+    this.showSearchSpinner(true, `Searching OpenStreetMap for "${query}"...`);
+    try {
+      const nomUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&addressdetails=1`;
+      const response = await fetch(nomUrl, {
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      this.showSearchSpinner(false);
+
+      if (data && data.length > 0) {
+        const item = data[0];
+        const lat = parseFloat(item.lat);
+        const lng = parseFloat(item.lon);
+        const displayName = item.display_name.split(',').slice(0, 3).join(', ');
+        this.setUserCoordinates(lat, lng, displayName, false);
+      } else {
+        // Fallback to text filtering across verified facilities
+        this.applyFiltersAndRender();
+        alert(`Could not pinpoint "${query}" on OpenStreetMap.
+
+Tip: You can tap or click anywhere on the Leaflet map to place your pin manually!`);
+      }
+    } catch (err) {
+      this.showSearchSpinner(false);
+      console.warn('Nominatim geocoding network notice:', err);
+      // Graceful offline fallback: filter local directory by search text
+      this.applyFiltersAndRender();
+    }
+  },
+
+  showSearchSpinner(show, text = 'Searching...') {
+    let spinner = document.getElementById('nearbySearchSpinner');
+    if (!spinner) {
+      const searchControls = document.querySelector('.search-controls-card');
+      if (searchControls) {
+        spinner = document.createElement('div');
+        spinner.id = 'nearbySearchSpinner';
+        spinner.style.cssText = 'font-size:0.85rem;color:var(--primary);margin-top:6px;display:none;align-items:center;gap:6px;font-weight:600;';
+        searchControls.appendChild(spinner);
+      }
+    }
+    if (spinner) {
+      spinner.style.display = show ? 'flex' : 'none';
+      spinner.innerHTML = `<span>⏳ ${text}</span>`;
+    }
+  },
+
+  // Overpass API Query for Live OpenStreetMap Hospitals, Clinics, and Shelters
+  async fetchOverpassNearbyPlaces(lat, lng, radiusKm) {
+    const radiusMeters = Math.min(25000, Math.max(2000, (radiusKm === 'all' ? 10 : radiusKm) * 1000));
+    const cacheKey = `${lat.toFixed(2)}_${lng.toFixed(2)}_${radiusMeters}`;
+
+    if (this.overpassCache[cacheKey]) {
+      this.liveOsmPlaces = this.overpassCache[cacheKey];
+      this.applyFiltersAndRender();
+      return;
+    }
+
+    const overpassQuery = `[out:json][timeout:8];(
+      node["amenity"~"hospital|clinic"](around:${radiusMeters},${lat},${lng});
+      way["amenity"~"hospital|clinic"](around:${radiusMeters},${lat},${lng});
+      node["social_facility"~"shelter|group_home"](around:${radiusMeters},${lat},${lng});
+      node["social_facility:for"="woman"](around:${radiusMeters},${lat},${lng});
+    );out center 25;`;
+
+    this.showSearchSpinner(true, 'Finding live nearby hospitals & shelters on OpenStreetMap...');
+
+    const endpoints = [
+      'https://overpass-api.de/api/interpreter',
+      'https://overpass.kumi.systems/api/interpreter'
+    ];
+
+    let rawData = null;
+    for (const ep of endpoints) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 7000);
+        const resp = await fetch(ep, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'data=' + encodeURIComponent(overpassQuery),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (resp.ok) {
+          rawData = await resp.json();
+          break;
+        }
+      } catch (e) {
+        // Continue to fallback
+      }
+    }
+
+    this.showSearchSpinner(false);
+
+    if (rawData && rawData.elements && rawData.elements.length > 0) {
+      const parsed = this.parseOverpassElements(rawData.elements, lat, lng);
+      this.overpassCache[cacheKey] = parsed;
+      this.liveOsmPlaces = parsed;
+      this.applyFiltersAndRender();
+    } else {
+      // Overpass timed out or no OSM nodes found — seamlessly fall back to verified directory
+      this.liveOsmPlaces = [];
+      this.applyFiltersAndRender();
+    }
+  },
+
+  parseOverpassElements(elements, centerLat, centerLng) {
+    const list = [];
+    elements.forEach((el, idx) => {
+      const tags = el.tags || {};
+      const name = tags.name || tags['name:en'] || tags.operator || (tags.amenity === 'hospital' ? 'Community Hospital' : (tags.amenity === 'clinic' ? 'Healthcare Clinic' : 'Community Safe Shelter'));
+      const pLat = el.lat || (el.center && el.center.lat);
+      const pLng = el.lon || (el.center && el.center.lon);
+      if (!pLat || !pLng) return;
+
+      let cat = 'hospital';
+      if (tags.emergency === 'yes' || /emergency|trauma|casualty|acute/i.test(name)) {
+        cat = 'emergency';
+      } else if (tags.social_facility === 'shelter' || tags['social_facility:for'] === 'woman' || /shelter|refuge|crisis/i.test(name)) {
+        cat = 'shelter';
+      } else if (tags.amenity === 'clinic') {
+        cat = 'hospital';
+      }
+
+      const street = tags['addr:street'] ? `${tags['addr:street']}${tags['addr:housenumber'] ? ' ' + tags['addr:housenumber'] : ''}` : '';
+      const city = tags['addr:city'] || tags['addr:district'] || tags['addr:suburb'] || '';
+      const address = [street, city].filter(Boolean).join(', ') || `OpenStreetMap Coordinates [${pLat.toFixed(3)}, ${pLng.toFixed(3)}]`;
+      const phone = tags.phone || tags['contact:phone'] || tags['phone:emergency'] || 'Inquire on arrival / Call local 112 / 1122';
+      const hours = tags.opening_hours || (cat === 'emergency' ? '24/7 Open Emergency Casualty' : 'Standard Healthcare Hours');
+
+      list.push({
+        id: `osm-${el.id || idx}`,
+        name: name,
+        category: cat,
+        country: 'OpenStreetMap',
+        city: city || 'Local Area',
+        lat: pLat,
+        lng: pLng,
+        address: address,
+        phone: phone,
+        hours: hours,
+        verifiedSource: 'OpenStreetMap Live Data (OSM Contributors)',
+        lastVerified: 'Live Query',
+        serviceType: cat === 'emergency' ? 'Emergency Department & Casualty' : (cat === 'shelter' ? 'Women Shelter Facility' : 'Hospital Healthcare Services'),
+        capacityNotice: 'Discovered via live OpenStreetMap query. Capacity and current admission must be confirmed directly with facility.',
+        admissionNote: 'This facility was located via live OpenStreetMap data. Survivors seeking post-assault PEP or forensic documentation should verify officer presence in advance.',
+        googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + ' ' + address)}`,
+        sourceType: 'osm_live'
+      });
+    });
+    return list;
   },
 
   updateLocationStatusUI() {
@@ -4633,7 +4798,7 @@ const NearbyPlaces = {
     if (!badge) return;
 
     if (this.currentLocation) {
-      const typeLabel = this.currentLocation.isGps ? 'GPS' : 'Map Pin / Area';
+      const typeLabel = this.currentLocation.isGps ? 'GPS' : 'Map Pin / Search';
       badge.className = 'location-status-badge active';
       badge.innerHTML = `📍 Active: <strong>${this.currentLocation.name}</strong> (${typeLabel})`;
       if (btnClear) btnClear.style.display = 'inline-flex';
@@ -4660,7 +4825,19 @@ const NearbyPlaces = {
 
   // Filter places based on active criteria
   getFilteredPlaces() {
-    let list = this.verifiedPlaces.map(place => {
+    // Combine verified directory with live OSM query results, avoiding duplicate coords (< 250m)
+    const combined = [...this.verifiedPlaces];
+    this.liveOsmPlaces.forEach(osmPlace => {
+      const isDuplicate = combined.some(p => {
+        const d = this.calculateDistance(p.lat, p.lng, osmPlace.lat, osmPlace.lng);
+        return d < 0.25 || p.name.toLowerCase() === osmPlace.name.toLowerCase();
+      });
+      if (!isDuplicate) {
+        combined.push(osmPlace);
+      }
+    });
+
+    let list = combined.map(place => {
       let dist = null;
       if (this.currentLocation) {
         dist = this.calculateDistance(
@@ -4675,7 +4852,7 @@ const NearbyPlaces = {
 
     // 0. Country Filter
     if (this.selectedCountry !== 'all') {
-      list = list.filter(p => p.country === this.selectedCountry);
+      list = list.filter(p => p.country === this.selectedCountry || p.sourceType === 'osm_live');
     }
 
     // 1. Category Filter
@@ -4723,8 +4900,8 @@ const NearbyPlaces = {
   updateStatsCount(count) {
     const el = document.getElementById('nearbyResultsCount');
     if (el) {
-      const total = this.verifiedPlaces.length;
-      el.textContent = `Showing ${count} of ${total} verified safe facilities`;
+      const total = this.verifiedPlaces.length + this.liveOsmPlaces.length;
+      el.textContent = `Showing ${count} of ${total} safe facilities`;
     }
   },
 
@@ -4741,14 +4918,14 @@ const NearbyPlaces = {
           <p style="font-size:0.88rem;color:var(--text-muted);max-width:440px;margin:0 auto 16px auto;">
             ${this.selectedRadius !== 'all' && this.currentLocation
               ? `No safe places were found within <strong>${this.selectedRadius} km</strong> of ${this.currentLocation.name}. Try expanding the radius to <strong>25 km</strong> or searching a nearby major city.`
-              : `Try selecting "All Safe Places" or clearing your search query to view the complete nationwide directory.`}
+              : `Try selecting "All Safe Places" or clearing your search query to view the complete directory.`}
           </p>
           <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
             <button class="btn btn-sm btn-primary" onclick="NearbyPlaces.resetRadiusAndFilters()">
               🔄 Reset Filters
             </button>
             <button class="btn btn-sm btn-secondary" onclick="NearbyPlaces.openCurrentSearchInGoogleMaps()">
-              🌐 Search Entire Web on Google Maps
+              🌐 Search on Google Maps
             </button>
           </div>
         </div>
@@ -4762,6 +4939,10 @@ const NearbyPlaces = {
         ? `<span class="badge badge-primary" style="font-weight:700;font-size:0.8rem;">📍 ${p.distanceKm} km away</span>`
         : `<span class="badge badge-secondary" style="font-size:0.75rem;">${p.city}, ${p.country}</span>`;
 
+      const sourceBadge = p.sourceType === 'osm_live'
+        ? `<span class="badge" style="background:#e0f2fe;color:#0369a1;font-size:0.72rem;font-weight:600;">🌐 OpenStreetMap Live</span>`
+        : `<span class="badge" style="background:#dcfce7;color:#15803d;font-size:0.72rem;font-weight:600;">🛡️ Verified Directory</span>`;
+
       return `
         <article class="place-card ${this.selectedPlaceId === p.id ? 'highlighted' : ''}" id="card-place-${p.id}">
           <div class="place-card-header">
@@ -4769,6 +4950,7 @@ const NearbyPlaces = {
               <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
                 <span class="badge badge-category">${categoryObj.icon} ${categoryObj.label}</span>
                 ${distBadge}
+                ${sourceBadge}
               </div>
               <h3 class="place-name">${p.name}</h3>
             </div>
@@ -4798,11 +4980,11 @@ const NearbyPlaces = {
             ${p.serviceType ? `<div style="font-size:0.78rem;font-weight:600;color:var(--primary);margin-bottom:6px;">🏷️ Service: ${p.serviceType}</div>` : ''}
 
             <div class="place-admission-box">
-              <div class="admission-label">🛡️ Verified Source & Intake Protocol:</div>
+              <div class="admission-label">🛡️ Verification & Intake Protocol:</div>
               <div class="admission-text">${p.admissionNote}</div>
               ${p.capacityNotice ? `<div style="margin-top:6px;font-size:0.78rem;color:#b45309;"><strong>⚠️ Availability Note:</strong> ${p.capacityNotice}</div>` : ''}
               <div class="admission-source" style="margin-top:6px;">
-                Verified by: <em>${p.verifiedSource}</em> ${p.lastVerified ? `• Checked: <strong>${p.lastVerified}</strong>` : ''}
+                Source: <em>${p.verifiedSource}</em> ${p.lastVerified ? `• Checked: <strong>${p.lastVerified}</strong>` : ''}
               </div>
             </div>
           </div>
@@ -4812,13 +4994,10 @@ const NearbyPlaces = {
               📞 Call Now
             </a>
             <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary">
-              🧭 Directions
-            </a>
-            <a href="${p.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">
-              🗺️ Open in Google Maps
+              🧭 Get Directions
             </a>
             <button type="button" class="btn btn-sm btn-outline" onclick="NearbyPlaces.zoomToPlace(${p.lat}, ${p.lng}, '${p.id}')">
-              🎯 Show on Map
+              🎯 View on Map
             </button>
           </div>
         </article>
@@ -4839,24 +5018,18 @@ const NearbyPlaces = {
     this.applyFiltersAndRender();
   },
 
-  // Renders the Interactive Map using Leaflet.js (OpenStreetMap), Google Maps, or SVG Fallback
+  // Renders the Interactive Map using Leaflet.js (OpenStreetMap) or SVG Fallback
   renderInteractiveMap(places) {
     const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
     if (!mapCanvas) return;
 
-    // 1. Google Maps JS Mode (if configured by user/admin)
-    if (this.googleMapsLoaded && window.google && window.google.maps && this.googleMapInstance) {
-      this.updateGoogleMapsMarkers(places);
-      return;
-    }
-
-    // 2. Leaflet.js Mode (OpenStreetMap Interactive Engine)
+    // Leaflet.js Mode (OpenStreetMap Interactive Engine)
     if (typeof L !== 'undefined') {
       this.renderLeafletMap(places);
       return;
     }
 
-    // 3. Fallback SVG Map (if network blocked both Leaflet and Google Maps)
+    // Fallback SVG Map (if network completely blocked Leaflet CDN)
     this.renderSvgFallbackMap(places);
   },
 
@@ -4890,7 +5063,7 @@ const NearbyPlaces = {
       }).addTo(this.leafletMap);
 
       // CLICK MAP TO DROP PIN:
-      // Empowers users to set location anywhere on the map with 1 tap,
+      // Empowers survivors to set location anywhere on the map with 1 tap,
       // completely bypassing browser GPS blocks or denial errors!
       this.leafletMap.on('click', (e) => {
         this.setUserCoordinates(e.latlng.lat, e.latlng.lng, 'Pinned Point on Map', false);
@@ -4918,7 +5091,6 @@ const NearbyPlaces = {
       }
     }
 
-    // Invalidate size in case tab was hidden
     this.leafletMap.invalidateSize();
 
     // Clear previous place markers
@@ -5045,7 +5217,6 @@ const NearbyPlaces = {
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
             <a href="tel:${p.phone.replace(/[^0-9+]/g, '')}" class="btn btn-sm btn-primary" style="padding:4px 8px;font-size:0.76rem;">📞 Call</a>
             <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" style="padding:4px 8px;font-size:0.76rem;">🧭 Directions</a>
-            <a href="${p.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline" style="padding:4px 8px;font-size:0.76rem;">🗺️ G-Maps</a>
           </div>
         </div>
       `;
@@ -5090,7 +5261,7 @@ const NearbyPlaces = {
     }
   },
 
-  // Fallback SVG Visual Pinboard (used if both Leaflet and Google Maps are offline)
+  // Fallback SVG Visual Pinboard (used only if Leaflet library cannot be loaded)
   renderSvgFallbackMap(places) {
     const mapCanvas = document.getElementById('nearbyInteractiveMapCanvas');
     if (!mapCanvas) return;
@@ -5184,7 +5355,7 @@ const NearbyPlaces = {
     }
   },
 
-  // Open the active search query directly on Google Maps in a new tab
+  // Open active search query directly on Google Maps in a new tab
   openCurrentSearchInGoogleMaps() {
     let query = '';
     const catLabel = this.categories.find(c => c.id === this.selectedCategory)?.label || 'hospitals and safe shelters';
@@ -5193,134 +5364,15 @@ const NearbyPlaces = {
     query = `${catLabel} ${locLabel}`;
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
-  },
-
-  // Optional Google Maps JavaScript API integration
-  loadGoogleMapsScript(apiKey) {
-    if (!apiKey) return;
-    if (document.getElementById('google-maps-script')) return;
-
-    const script = document.createElement('script');
-    script.id = 'google-maps-script';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&callback=NearbyPlaces.onGoogleMapsReady&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    script.onerror = () => {
-      console.warn('Google Maps API failed to load (falling back to Leaflet.js OpenStreetMap).');
-      this.googleMapsLoaded = false;
-    };
-    document.head.appendChild(script);
-  },
-
-  onGoogleMapsReady() {
-    this.googleMapsLoaded = true;
-    const mapContainer = document.getElementById('nearbyInteractiveMapCanvas');
-    if (!mapContainer || !window.google || !window.google.maps) return;
-
-    const center = this.currentLocation
-      ? { lat: this.currentLocation.lat, lng: this.currentLocation.lng }
-      : { lat: 31.5204, lng: 74.3587 };
-
-    this.googleMapInstance = new google.maps.Map(mapContainer, {
-      center: center,
-      zoom: 12,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: true,
-      styles: [
-        { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
-        { featureType: 'transit', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] }
-      ]
-    });
-
-    this.applyFiltersAndRender();
-  },
-
-  updateGoogleMapsMarkers(places) {
-    if (!this.googleMapInstance) return;
-
-    this.mapMarkers.forEach(m => m.setMap(null));
-    this.mapMarkers = [];
-
-    const bounds = new google.maps.LatLngBounds();
-
-    if (this.currentLocation) {
-      const userPos = { lat: this.currentLocation.lat, lng: this.currentLocation.lng };
-      const userMarker = new google.maps.Marker({
-        position: userPos,
-        map: this.googleMapInstance,
-        title: 'You are here',
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: '#0d9488',
-          fillOpacity: 1,
-          strokeColor: '#ffffff',
-          strokeWeight: 3
-        }
-      });
-      this.mapMarkers.push(userMarker);
-      bounds.extend(userPos);
-    }
-
-    places.forEach(p => {
-      const pos = { lat: p.lat, lng: p.lng };
-      const marker = new google.maps.Marker({
-        position: pos,
-        map: this.googleMapInstance,
-        title: p.name
-      });
-
-      const infoWindow = new google.maps.InfoWindow({
-        content: `
-          <div style="padding:6px;max-width:240px;color:#0f172a;">
-            <strong style="font-size:0.92rem;">${p.name}</strong>
-            <p style="font-size:0.78rem;margin:4px 0;color:#475569;">${p.address}</p>
-            <p style="font-size:0.78rem;margin:4px 0;"><strong>${p.phone}</strong></p>
-            <a href="${p.googleMapsUrl}" target="_blank" style="font-size:0.78rem;color:#0d9488;font-weight:600;">Directions & Maps</a>
-          </div>
-        `
-      });
-
-      marker.addListener('click', () => {
-        infoWindow.open(this.googleMapInstance, marker);
-        this.highlightPlace(p.id);
-      });
-
-      this.mapMarkers.push(marker);
-      bounds.extend(pos);
-    });
-
-    if (places.length > 0) {
-      this.googleMapInstance.fitBounds(bounds);
-    }
-  },
-
-  saveApiKey(key) {
-    this.gmapsApiKey = key;
-    try {
-      localStorage.setItem('shecare_gmaps_api_key', key);
-    } catch (e) {}
-
-    if (key) {
-      this.loadGoogleMapsScript(key);
-    } else {
-      this.googleMapsLoaded = false;
-      this.googleMapInstance = null;
-      this.applyFiltersAndRender();
-    }
-  },
-
-  clearApiKey() {
-    this.gmapsApiKey = '';
-    try {
-      localStorage.removeItem('shecare_gmaps_api_key');
-    } catch (e) {}
-    this.googleMapsLoaded = false;
-    this.googleMapInstance = null;
-    this.applyFiltersAndRender();
   }
 };
+
+// Aliases for compatibility with other teammates or legacy filenames
+if (typeof window !== 'undefined') {
+  window.NearbyPlaces = NearbyPlaces;
+  window.SafePlaces = NearbyPlaces;
+  window.NearbyHealthcare = NearbyPlaces;
+}
 
 // Auto-register on DOMContentLoaded
 window.addEventListener('DOMContentLoaded', () => {
