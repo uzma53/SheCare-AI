@@ -16,7 +16,9 @@ const STATIC_ASSETS = [
   './js/pregnancy_sti.js',
   './js/sos.js',
   './js/safety_plan.js',
+  './js/agency_reporting.js',
   './js/nearby_places.js',
+  './css/safe_places.css',
   './js/app.js',
   './manifest.json'
 ];
