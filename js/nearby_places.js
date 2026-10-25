@@ -1089,7 +1089,11 @@ const NearbyPlaces = {
   isOverpassLoading: false,
 
   init() {
-    try { this.setupEventListeners(); } catch (e) { console.error('setupEventListeners error:', e); }
+    // init() is reached from two places (module self-start + App.init); attach button handlers only once
+    if (!this._listenersBound) {
+      this._listenersBound = true;
+      try { this.setupEventListeners(); } catch (e) { console.error('setupEventListeners error:', e); }
+    }
     try { this.renderCountryPills(); } catch (e) { console.error('renderCountryPills error:', e); }
     try { this.renderCategoryChips(); } catch (e) { console.error('renderCategoryChips error:', e); }
     try { this.renderRadiusPills(); } catch (e) { console.error('renderRadiusPills error:', e); }
