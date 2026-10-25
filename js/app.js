@@ -27,6 +27,7 @@ const App = {
     this.initPregnancySTI();
     this.initSOS();
     this.initNearbyPlaces();
+    this.initAgencyReporting();
     this.initSafetyPlan();
     this.initAuthAndSessions();
 
@@ -845,6 +846,12 @@ const App = {
   },
 
   // Safety Plan & Verified Directory Module
+  initAgencyReporting() {
+    if (typeof AgencyReporting !== 'undefined' && AgencyReporting.init) {
+      AgencyReporting.init();
+    }
+  },
+
   initNearbyPlaces() {
     if (typeof NearbyPlaces !== 'undefined' && NearbyPlaces.init) {
       NearbyPlaces.init();
