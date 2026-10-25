@@ -344,3 +344,214 @@
     padding: 16px;
   }
 }
+
+
+/* --- SECURITY AGENCY CONTACT & EMERGENCY INCIDENT DISPATCH BANNER --- */
+.emergency-agency-dispatch-banner {
+  background: linear-gradient(135deg, #fff1f2 0%, #fff7ed 100%);
+  border: 2px solid #f87171;
+  border-radius: var(--radius-lg, 16px);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dispatch-banner-badge {
+  display: inline-block;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.dispatch-banner-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #991b1b;
+  margin: 6px 0 4px 0;
+}
+
+.dispatch-banner-desc {
+  font-size: 0.88rem;
+  color: #7f1d1d;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.dispatch-banner-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.btn-dispatch-action {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  padding: 9px 18px !important;
+  border-radius: 8px !important;
+  border: none !important;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.28);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-dispatch-action:hover {
+  background: #b91c1c !important;
+  transform: translateY(-1px);
+}
+
+.btn-dispatch-call {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-decoration: none;
+  background: #ffffff;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  transition: all 0.2s ease;
+}
+
+.btn-dispatch-call:hover {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Police and Rescue Marker Pin Colors */
+.leaflet-marker-pin.police {
+  border-color: #1e3a8a !important;
+  background: #eff6ff !important;
+}
+
+.leaflet-marker-pin.rescue {
+  border-color: #ea580c !important;
+  background: #fff7ed !important;
+}
+
+/* Modal Agency Reporting Styles */
+.agency-role-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.agency-role-btn {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.86rem;
+  text-align: left;
+  transition: all 0.2s ease;
+  line-height: 1.4;
+}
+
+.agency-role-btn:hover {
+  border-color: #f87171;
+}
+
+.agency-role-btn.active {
+  border-color: #dc2626;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.agency-situation-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  margin: 3px 3px 3px 0;
+  transition: all 0.15s ease;
+}
+
+.agency-situation-chip:hover {
+  background: #e2e8f0;
+}
+
+.agency-situation-chip.active {
+  background: #fee2e2;
+  border-color: #f87171;
+  color: #991b1b;
+  font-weight: 700;
+}
+
+.agency-preview-box {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8rem;
+  background: #0f172a;
+  color: #38bdf8;
+  border-radius: 8px;
+  padding: 12px;
+  width: 100%;
+  height: 130px;
+  border: 1px solid #334155;
+  resize: vertical;
+  line-height: 1.45;
+  box-sizing: border-box;
+}
+
+.agency-call-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn-agency-direct-call {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.82rem;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.btn-agency-direct-call:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.btn-agency-direct-call.urgent {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.btn-agency-direct-call.urgent:hover {
+  background: #fee2e2;
+  border-color: #f87171;
+}
