@@ -376,7 +376,7 @@ class SheCareVerificationTests(unittest.TestCase):
         sw_path = os.path.join(BASE_DIR, 'sw.js')
         sw_code = get_source_content('sw.js')
 
-        self.assertIn("shecare-v2.3", sw_code)
+        self.assertIn("shecare-v2.4", sw_code)
         # Ensure it checks mode === 'navigate' or text/html before returning index.html
         self.assertIn("e.request.mode === 'navigate'", sw_code)
         self.assertIn("accept.includes('text/html')", sw_code)
