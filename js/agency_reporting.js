@@ -225,7 +225,7 @@ const AgencyReporting = {
   // Detect GPS directly from inside modal
   detectDeviceGps() {
     if (!navigator.geolocation) {
-      alert('Browser geolocation is unavailable on this device. You can type your location or choose on the Leaflet map.');
+      alert('Browser geolocation is unavailable on this device. You can type your location instead.');
       return;
     }
 
