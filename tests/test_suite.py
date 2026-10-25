@@ -634,5 +634,71 @@ class SheCareVerificationTests(unittest.TestCase):
         self.assertIn('searchCurrentMapArea', nearby_code)
         self.assertIn('btnSearchVisibleArea', index_html)
 
+    # -------------------------------------------------------------
+    # 24. Police & Rescue Categories and Verified Security Centers
+    # -------------------------------------------------------------
+    def test_26_police_and_rescue_categories_and_verified_centers(self):
+        """Verify police & rescue categories and authentic security agency facilities exist."""
+        nearby_code = get_source_content(os.path.join('js', 'nearby_places.js'))
+
+        # Check new categories
+        self.assertIn("id: 'police'", nearby_code)
+        self.assertIn("id: 'rescue'", nearby_code)
+        self.assertIn("Police & Security Agencies", nearby_code)
+        self.assertIn("Rescue 1122 & Ambulance Stations", nearby_code)
+
+        # Check verified police & security agency facilities
+        self.assertIn("Punjab Safe City Authority & Police 15 Command Centre", nearby_code)
+        self.assertIn("Women Police Station Lahore", nearby_code)
+        self.assertIn("Rescue 1122 Provincial Headquarters", nearby_code)
+        self.assertIn("Central Police Office (CPO Karachi) & Police 15 Command", nearby_code)
+        self.assertIn("CPLC Central Reporting Cell (Governor House Karachi)", nearby_code)
+        self.assertIn("Women & Child Protection Police Cell Karachi", nearby_code)
+        self.assertIn("Islamabad Safe City Authority & Police 15 Command", nearby_code)
+        self.assertIn("Delhi Police Central Control Room", nearby_code)
+
+    # -------------------------------------------------------------
+    # 25. Security Agency Location Sharing & Incident Reporting System
+    # -------------------------------------------------------------
+    def test_27_security_agency_reporting_and_location_sharing(self):
+        """Verify agency reporting module, survivor/witness role switching, live GPS sharing, and dispatch channels."""
+        self.assertTrue(os.path.exists(os.path.join(BASE_DIR, 'js', 'agency_reporting.js')))
+        agency_code = get_source_content(os.path.join('js', 'agency_reporting.js'))
+        index_html = get_source_content('index.html')
+        section_html = get_source_content('safe_places_section.html')
+
+        # Check official emergency agency numbers
+        self.assertIn("'15'", agency_code)      # Pakistan Police Rescue 15
+        self.assertIn("'1122'", agency_code)    # Pakistan Rescue 1122
+        self.assertIn("'115'", agency_code)     # Pakistan Edhi 115
+        self.assertIn("'1099'", agency_code)    # Pakistan National Women Helpline
+        self.assertIn("'1102'", agency_code)    # Pakistan CPLC Karachi
+        self.assertIn("'112'", agency_code)     # India / International Emergency
+        self.assertIn("'181'", agency_code)     # India Women Helpline
+        self.assertIn("'911'", agency_code)     # US/Canada 911
+
+        # Check survivor vs. witness reporting roles
+        self.assertIn("CRITICAL SURVIVOR DISTRESS REPORT", agency_code)
+        self.assertIn("WITNESS / BYSTANDER INCIDENT REPORT", agency_code)
+
+        # Check live GPS location & Google Maps pin link generation
+        self.assertIn("GPS COORDINATES:", agency_code)
+        self.assertIn("https://maps.google.com/?q=", agency_code)
+        self.assertIn("LIVE MAP PIN:", agency_code)
+
+        # Check dispatch channels
+        self.assertIn("dispatchViaSms", agency_code)
+        self.assertIn("dispatchViaWhatsApp", agency_code)
+        self.assertIn("copyReportToClipboard", agency_code)
+        self.assertIn("dispatchViaNativeShare", agency_code)
+        self.assertIn("logIncidentLocally", agency_code)
+
+        # Check HTML integration
+        self.assertIn('id="modalAgencyReport"', index_html)
+        self.assertIn('emergency-agency-dispatch-banner', index_html)
+        self.assertIn('emergency-agency-dispatch-banner', section_html)
+        self.assertIn('id="btnOpenAgencyReportModal"', index_html)
+        self.assertIn('js/agency_reporting.js', index_html)
+
 if __name__ == '__main__':
     unittest.main()
